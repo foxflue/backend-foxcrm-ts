@@ -1,5 +1,5 @@
 import express from "express";
-import catchAsync from "../utils/catch.async";
+import catchAsync from "../utils/catchAsync.utils";
 
 const four04Route = express.Router();
 
