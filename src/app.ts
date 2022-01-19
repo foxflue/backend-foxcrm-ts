@@ -3,8 +3,9 @@ import express from "express";
 import mongoose from "mongoose";
 import four04Route from "./common/404.error";
 import { globalErrorHandler } from "./common/error.controller";
+import authRouth from "./routes/auth.route";
 
-dotenv.config({ path: __dirname + "./../.env" });
+dotenv.config();
 
 const app = express();
 
@@ -23,6 +24,9 @@ try {
   process.exit(1);
 }
 
+app.use(express.json());
+
+app.use("/api/v2", authRouth);
 app.use(four04Route);
 app.use(globalErrorHandler);
 
