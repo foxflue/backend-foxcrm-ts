@@ -4,6 +4,9 @@ import mongoose from "mongoose";
 import four04Route from "./common/404.error";
 import { globalErrorHandler } from "./common/error.controller";
 import authRoute from "./routes/auth.route";
+import dashboardRoute from "./routes/dashboard.route";
+import fileRoute from "./routes/file.route";
+import leadRoute from "./routes/lead.route";
 import postRoute from "./routes/post.route";
 import projectRoute from "./routes/project.route";
 import userRoute from "./routes/user.route";
@@ -12,9 +15,9 @@ dotenv.config();
 
 const app = express();
 
-const PORT = 1227;
-const HOST = process.env.HOST as string;
-const MONGO_URI = process.env.MONGODB_URL as string;
+const PORT = Object(process.env).PORT as number;
+const HOST = Object(process.env).HOST as string;
+const MONGO_URI = Object(process.env).MONGODB_URL as string;
 
 // Connect MongoDB
 try {
@@ -33,6 +36,9 @@ app.use("/api/v2", authRoute);
 app.use("/api/v2", userRoute);
 app.use("/api/v2", projectRoute);
 app.use("/api/v2", postRoute);
+app.use("/api/v2", leadRoute);
+app.use("/api/v2", fileRoute);
+app.use("/api/v2", dashboardRoute);
 app.use(four04Route);
 app.use(globalErrorHandler);
 
