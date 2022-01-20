@@ -1,7 +1,11 @@
 import { Request } from "express";
 import jwt from "jsonwebtoken";
 
-const extractToken = (req: Request) => {
+type extractTokenTypeDetails = (req: Request) => string | false;
+type verifyTokenTypeDetails = (token: string) => object | string;
+type SignTokenTypeDetails = (id: string, rememberme: boolean) => string;
+
+const extractToken: extractTokenTypeDetails = (req) => {
   let token = req.header("authorization") as string;
 
   if (!token) {
@@ -12,10 +16,10 @@ const extractToken = (req: Request) => {
   return token;
 };
 
-const verifyToken = (token: string) =>
+const verifyToken: verifyTokenTypeDetails = (token) =>
   jwt.verify(token, Object(process.env).JWT_SECRET_KEY);
 
-const signToken = (id: string, rememberme: boolean) => {
+const signToken: SignTokenTypeDetails = (id, rememberme) => {
   return jwt.sign({ id }, Object(process.env).JWT_SECRET_KEY, {
     expiresIn: rememberme ? "7d" : "1d",
   });

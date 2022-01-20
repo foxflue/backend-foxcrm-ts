@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer";
 
-const sendEmail = async (options: object) => {
-  console.log(Object(process.env).NODEMAILER_HOST);
+type sendEmailTypeDetails = (options: object) => void;
 
+const sendEmail: sendEmailTypeDetails = async (options) => {
   const transporter = nodemailer.createTransport({
     host: Object(process.env).NODEMAILER_HOST,
     port: Object(process.env).NODEMAILER_PORT,
@@ -11,6 +11,7 @@ const sendEmail = async (options: object) => {
       pass: Object(process.env).NODEMAILER_PASS,
     },
   });
+
   const emailOptions = {
     from: `"${Object(process.env).NODEMAILER_FROM}"< ${
       Object(process.env).NODEMAILER_EMAIL
