@@ -3,7 +3,10 @@ import express from "express";
 import mongoose from "mongoose";
 import four04Route from "./common/404.error";
 import { globalErrorHandler } from "./common/error.controller";
-import authRouth from "./routes/auth.route";
+import authRoute from "./routes/auth.route";
+import postRoute from "./routes/post.route";
+import projectRoute from "./routes/project.route";
+import userRoute from "./routes/user.route";
 
 dotenv.config();
 
@@ -26,7 +29,10 @@ try {
 
 app.use(express.json());
 
-app.use("/api/v2", authRouth);
+app.use("/api/v2", authRoute);
+app.use("/api/v2", userRoute);
+app.use("/api/v2", projectRoute);
+app.use("/api/v2", postRoute);
 app.use(four04Route);
 app.use(globalErrorHandler);
 
