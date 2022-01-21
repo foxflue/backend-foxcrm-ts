@@ -21,10 +21,10 @@ router
     fileController.destroy
   );
 
-router.post(
-  "/file/get-signed-url",
-  [authMiddleware.checkLogin, authMiddleware.checkAdmin],
-  fileController.getSignedUrl
-);
+// router.post(
+//   "/file/get-signed-url",
+//   [authMiddleware.checkLogin, authMiddleware.checkAdmin],
+//   fileController.getSignedUrl
+// );
 
 export default router;

@@ -3,6 +3,12 @@ import { NextFunction, Request, Response } from "express";
 import Project, { ProjectDocument } from "./../model/project.model";
 import catchAsync from "./../utils/catchAsync.utils";
 
+type projectType = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => object | void;
+
 // const index = catchAsync(async (req, res, next) => {
 //   const features = new APIFeatures(
 //     Project.find().populate('customer'),
@@ -31,16 +37,14 @@ import catchAsync from "./../utils/catchAsync.utils";
  * @memberof ProjectController
  * @route POST /api/v1/project/
  */
-const store = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    req.body.due_amount = req.body.price as number;
-    const project = await Project.create(req.body);
-    res.status(201).json({
-      status: "success",
-      data: project,
-    });
-  }
-);
+const store: projectType = catchAsync(async (req, res, next) => {
+  req.body.due_amount = req.body.price as number;
+  const project = await Project.create(req.body);
+  res.status(201).json({
+    status: "success",
+    data: project,
+  });
+});
 
 /**
  * View a single project
@@ -51,22 +55,20 @@ const store = catchAsync(
  * @memberof ProjectController
  * @route GET /api/v1/project/:id
  */
-const show = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const project: ProjectDocument = await Project.findById(
-      req.params.id as string
-    ).populate("customer payments");
+const show: projectType = catchAsync(async (req, res, next) => {
+  const project: ProjectDocument = await Project.findById(
+    req.params.id as string
+  ).populate("customer payments");
 
-    if (!project) {
-      return next(new Error("No project found with that ID"));
-    }
-
-    res.status(200).json({
-      status: "success",
-      data: project,
-    });
+  if (!project) {
+    return next(new Error("No project found with that ID"));
   }
-);
+
+  res.status(200).json({
+    status: "success",
+    data: project,
+  });
+});
 
 /**
  * Update project
@@ -77,27 +79,25 @@ const show = catchAsync(
  * @memberof ProjectController
  * @route PATCH /api/v1/project/:id
  */
-const update = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const project = (await Project.findByIdAndUpdate(
-      req.params.id as string,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    )) as ProjectDocument;
-
-    if (!project) {
-      return next(new Error("No project found with that ID"));
+const update: projectType = catchAsync(async (req, res, next) => {
+  const project = (await Project.findByIdAndUpdate(
+    req.params.id as string,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
     }
+  )) as ProjectDocument;
 
-    res.status(200).json({
-      status: "success",
-      data: project,
-    });
+  if (!project) {
+    return next(new Error("No project found with that ID"));
   }
-);
+
+  res.status(200).json({
+    status: "success",
+    data: project,
+  });
+});
 
 /**
  * Delete project
@@ -109,24 +109,22 @@ const update = catchAsync(
  * @memberof ProjectController
  * @route DELETE /api/v1/project/:id
  */
-const destroy = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const project = (await Project.findByIdAndDelete(
-      req.params.id
-    )) as ProjectDocument;
+const destroy: projectType = catchAsync(async (req, res, next) => {
+  const project = (await Project.findByIdAndDelete(
+    req.params.id
+  )) as ProjectDocument;
 
-    if (!project) {
-      return next(new Error("No project found with that ID"));
-    }
-
-    // Delete Payments attached to Project
-
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
+  if (!project) {
+    return next(new Error("No project found with that ID"));
   }
-);
+
+  // Delete Payments attached to Project
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+});
 
 export default {
   // index,

@@ -10,11 +10,11 @@ router.post("/auth/login", authController.login);
 router.get("/auth/user", authMiddleware.checkLogin, authController.me);
 router.post("/auth/logout", authMiddleware.checkLogin, authController.logout);
 router.post("/auth/verify-email/:token", authController.verifyEmail);
-// router.post(
-//   '/auth/forgot-password',
-//   [checkCaptcha],
-//   authController.forgotPassword
-// );
-// router.post('/auth/reset-password/:token', authController.resetPassword);
+router.post(
+  "/auth/forgot-password",
+  //   [checkCaptcha],
+  authController.forgotPassword
+);
+router.post("/auth/reset-password/:token", authController.resetPassword);
 
 export default router;

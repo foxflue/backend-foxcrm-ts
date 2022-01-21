@@ -10,6 +10,13 @@ interface RegisterCredential {
   email: string;
   phone: string;
 }
+
+type storeAndShowType = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => object | void;
+
 // const index = catchAsync(async (req, res, next) => {
 //   const apiFeature = new APIFeature(User.find(), req.query)
 //     .filter()
@@ -26,33 +33,29 @@ interface RegisterCredential {
 //   });
 // });
 
-const store = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    await User.create(req.body as RegisterCredential);
-    res.status(201).json({
-      status: "success",
-      message: "User has been added",
-    });
-  }
-);
+const store: storeAndShowType = catchAsync(async (req, res, next) => {
+  await User.create(req.body as RegisterCredential);
+  res.status(201).json({
+    status: "success",
+    message: "User has been added",
+  });
+});
 
-const show = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const user: UserDocument = await User.findById(
-      req.params.id as string
-    ).populate({
-      path: "projects",
-      select: "-content",
-    });
-    if (!user) {
-      return next(new Error("User not found"));
-    }
-    res.status(200).json({
-      status: "success",
-      data: omit(user.toJSON(), "password"),
-    });
+const show: storeAndShowType = catchAsync(async (req, res, next) => {
+  const user: UserDocument = await User.findById(
+    req.params.id as string
+  ).populate({
+    path: "projects",
+    select: "-content",
+  });
+  if (!user) {
+    return next(new Error("User not found"));
   }
-);
+  res.status(200).json({
+    status: "success",
+    data: omit(user.toJSON(), "password"),
+  });
+});
 
 // const destroy = catchAsync(
 //   async (req: Request, res: Response, next: NextFunction) => {

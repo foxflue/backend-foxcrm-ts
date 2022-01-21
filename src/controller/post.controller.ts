@@ -5,6 +5,12 @@ import { AppError } from "./../utils/AppError.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 import hook from "./../utils/hook";
 
+type postType = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => void | object;
+
 // const index = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
 //   const features = new APIFeatures(Post.find().select('-content'), req.query)
 //     .filter()
@@ -21,71 +27,63 @@ import hook from "./../utils/hook";
 //   });
 // });
 
-const store = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const post: PostDocument = await Post.create(req.body);
-    await hook();
-    res.status(201).json({
-      status: "success",
-      data: post,
-    });
-  }
-);
+const store: postType = catchAsync(async (req, res, next) => {
+  const post: PostDocument = await Post.create(req.body);
+  await hook();
+  res.status(201).json({
+    status: "success",
+    data: post,
+  });
+});
 
-const show = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const post = (await Post.findOne({
+const show: postType = catchAsync(async (req, res, next) => {
+  const post = (await Post.findOne({
+    slug: req.params.slug as string,
+  })) as PostDocument;
+
+  if (!post) {
+    return next(new AppError("No post found with that", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: post,
+  });
+});
+
+const update: postType = catchAsync(async (req, res, next) => {
+  const post = (await Post.findOneAndUpdate(
+    {
       slug: req.params.slug as string,
-    })) as PostDocument;
+    },
+    req.body
+  )) as PostDocument;
 
-    if (!post) {
-      return next(new AppError("No post found with that", 404));
-    }
-    res.status(200).json({
-      status: "success",
-      data: post,
-    });
+  if (!post) {
+    return next(new AppError("No post found with that slug", 404));
   }
-);
+  await hook();
 
-const update = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const post = (await Post.findOneAndUpdate(
-      {
-        slug: req.params.slug as string,
-      },
-      req.body
-    )) as PostDocument;
+  res.status(200).json({
+    status: "success",
+    data: post,
+  });
+});
 
-    if (!post) {
-      return next(new AppError("No post found with that slug", 404));
-    }
-    await hook();
+const destroy: postType = catchAsync(async (req, res, next) => {
+  const post = (await Post.findOneAndDelete({
+    slug: req.params.slug as string,
+  })) as PostDocument;
 
-    res.status(200).json({
-      status: "success",
-      data: post,
-    });
+  if (!post) {
+    return next(new AppError("No post found with that slug", 404));
   }
-);
+  await hook();
 
-const destroy = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    const post = (await Post.findOneAndDelete({
-      slug: req.params.slug as string,
-    })) as PostDocument;
-
-    if (!post) {
-      return next(new AppError("No post found with that slug", 404));
-    }
-    await hook();
-
-    res.status(204).json({
-      status: "success",
-      data: null,
-    });
-  }
-);
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+});
 
 export default {
   // index,
