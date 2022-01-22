@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { omit } from "lodash";
+import Project from "./../model/project.model";
 import { User, UserDocument } from "./../model/user.model";
-// import Project from './../project/model.js';
 import APIFeature from "./../utils/apiFeture.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 
@@ -57,53 +57,53 @@ const show: storeAndShowType = catchAsync(async (req, res, next) => {
   });
 });
 
-// const destroy = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const user = await User.findByIdAndDelete(req.params.id as string);
-//     if (!user) {
-//       return next(new Error("User not found"));
-//     }
+const destroy = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = await User.findByIdAndDelete(req.params.id as string);
+    if (!user) {
+      return next(new Error("User not found"));
+    }
 
-//     // Delete User Projects
-//     await Project.deleteMany({ customer: req.params.id });
+    // Delete User Projects
+    await Project.deleteMany({ customer: req.params.id });
 
-//     res.status(204).json({
-//       status: "success",
-//       data: null,
-//     });
-//   }
-// );
+    res.status(204).json({
+      status: "success",
+      data: null,
+    });
+  }
+);
 
-// const dashboard = catchAsync(
-//   async (req: Request, res: Response, next: NextFunction) => {
-//     const projects = await Project.find({
-//       customer: req.user.id,
-//       status: "processing",
-//     })
-//       .limit(5)
-//       .sort({ createdAt: -1 });
+const dashboard = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const projects = await Project.find({
+      customer: res.locals.user._id,
+      status: "processing",
+    })
+      .limit(5)
+      .sort({ createdAt: -1 });
 
-//     const payments = await Project.find({
-//       customer: req.user.id,
-//       status: "pending",
-//     })
-//       .limit(5)
-//       .sort({ createdAt: -1 });
+    const payments = await Project.find({
+      customer: res.locals.user._id,
+      status: "pending",
+    })
+      .limit(5)
+      .sort({ createdAt: -1 });
 
-//     res.status(200).json({
-//       status: "success",
-//       data: {
-//         projects,
-//         payments,
-//       },
-//     });
-//   }
-// );
+    res.status(200).json({
+      status: "success",
+      data: {
+        projects,
+        payments,
+      },
+    });
+  }
+);
 
 export default {
   index,
   store,
   show,
-  // destroy,
-  // dashboard
+  destroy,
+  dashboard,
 };

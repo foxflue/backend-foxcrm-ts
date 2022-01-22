@@ -15,20 +15,20 @@ router
     UserController.store
   );
 
-// router.get(
-//   '/user/dashboard',
-//   authMiddleware.checkLogin,
-//   UserController.dashboard
-// );
+router.get(
+  "/user/dashboard",
+  authMiddleware.checkLogin,
+  UserController.dashboard
+);
 router
   .route("/user/:id")
   .get(
     [authMiddleware.checkLogin, authMiddleware.checkAdmin],
     UserController.show
+  )
+  .delete(
+    [authMiddleware.checkLogin, authMiddleware.checkAdmin],
+    UserController.destroy
   );
-//   .delete(
-//     [authMiddleware.checkLogin, authMiddleware.checkAdmin],
-//     UserController.destroy
-//   );
 
 export default router;
