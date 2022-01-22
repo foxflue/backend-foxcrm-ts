@@ -12,7 +12,8 @@ type leadType = (
 ) => void | object;
 
 const index: leadType = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(await Lead.find(), req.query)
+  console.log(Lead.find());
+  const features = new APIFeatures(Lead.find(), req.query)
     .filter()
     .sort()
     .limitFields()

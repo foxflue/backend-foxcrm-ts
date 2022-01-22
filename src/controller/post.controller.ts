@@ -13,10 +13,7 @@ type postType = (
 
 const index = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const features = new APIFeatures(
-      await Post.find().select("-content"),
-      req.query
-    )
+    const features = new APIFeatures(Post.find().select("-content"), req.query)
       .filter()
       .sort()
       .limitFields()

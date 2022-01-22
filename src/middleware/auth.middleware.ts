@@ -49,7 +49,6 @@ const checkLogin = catchAsync(
 
 const checkAdmin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    console.log(res.locals.user);
     if (res.locals.user.role !== "admin") {
       return res.status(401).json({
         status: "fail",

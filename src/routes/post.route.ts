@@ -6,12 +6,14 @@ import { validate } from "./../middleware/validate.middleware";
 
 const router = express.Router();
 
-router.route("/post").get(postController.index).post(
-  [authMiddleware.checkLogin, authMiddleware.checkAdmin],
-  // validator,
-  validate(postSchema),
-  postController.store
-);
+router
+  .route("/post")
+  .get(postController.index)
+  .post(
+    [authMiddleware.checkLogin, authMiddleware.checkAdmin],
+    validate(postSchema),
+    postController.store
+  );
 router
   .route("/post/:slug")
   .get(postController.show)

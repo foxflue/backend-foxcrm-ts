@@ -18,7 +18,7 @@ const s3 = new aws.S3({
 });
 
 const index = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(await File.find(), req.query)
+  const features = new APIFeatures(File.find(), req.query)
     .filter()
     .sort()
     .limitFields()
