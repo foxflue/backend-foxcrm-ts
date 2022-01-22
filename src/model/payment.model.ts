@@ -5,7 +5,7 @@ import { UserDocument } from "./user.model";
 export interface PaymentDocument extends mongoose.Document {
   project: ProjectDocument["_id"];
   customer: UserDocument["_id"];
-  getway: object;
+  gateway: object;
   transaction_id: string;
   amount: number;
   currency: string;
