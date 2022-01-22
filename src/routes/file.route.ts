@@ -5,10 +5,10 @@ const router = express.Router();
 
 router
   .route("/file")
-  //   .get(
-  //     [authMiddleware.checkLogin, authMiddleware.checkAdmin],
-  //     fileController.index
-  //   )
+  .get(
+    [authMiddleware.checkLogin, authMiddleware.checkAdmin],
+    fileController.index
+  )
   .post(
     [authMiddleware.checkLogin, authMiddleware.checkAdmin],
     fileController.store

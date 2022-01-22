@@ -7,6 +7,7 @@ import authRoute from "./routes/auth.route";
 import dashboardRoute from "./routes/dashboard.route";
 import fileRoute from "./routes/file.route";
 import leadRoute from "./routes/lead.route";
+import paymentRoute from "./routes/payment.route";
 import postRoute from "./routes/post.route";
 import projectRoute from "./routes/project.route";
 import userRoute from "./routes/user.route";
@@ -39,6 +40,7 @@ app.use("/api/v2", postRoute);
 app.use("/api/v2", leadRoute);
 app.use("/api/v2", fileRoute);
 app.use("/api/v2", dashboardRoute);
+app.use("/api/v2", paymentRoute);
 app.use(four04Route);
 app.use(globalErrorHandler);
 

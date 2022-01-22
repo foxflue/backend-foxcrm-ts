@@ -6,10 +6,10 @@ const router = express.Router();
 
 router
   .route("/user")
-  //   .get(
-  //     [authMiddleware.checkLogin, authMiddleware.checkAdmin],
-  //     UserController.index
-  //   )
+  .get(
+    [authMiddleware.checkLogin, authMiddleware.checkAdmin],
+    UserController.index
+  )
   .post(
     [authMiddleware.checkLogin, authMiddleware.checkAdmin],
     UserController.store
