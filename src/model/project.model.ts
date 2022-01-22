@@ -1,10 +1,11 @@
 import mongoose from "mongoose";
+import { UserDocument } from "./user.model";
 
 export interface ProjectDocument extends mongoose.Document {
   title: string;
   content: string;
   entities: string[];
-  customer: string;
+  customer: UserDocument["_id"];
   currency: string;
   price: number;
   due_amount: number;
@@ -83,15 +84,17 @@ const ProjectSchema = new mongoose.Schema(
 );
 
 // Associated Payments
-// ProjectSchema.virtual('payments', {
-//   ref: 'Payment',
-//   localField: '_id',
-//   foreignField: 'project',
-// });
+ProjectSchema.virtual("payments", {
+  ref: "Payment",
+  localField: "_id",
+  foreignField: "project",
+});
 
 // Virtual Due Amount for Project
 // ProjectSchema.virtual('payment_made').get(function () {
 //   let totalPayment = 0;
+//   const project = this as ProjectDocument;
+
 //   if (this.payments && this.payments.length > 0) {
 //     this.payments.forEach((payment) => {
 //       totalPayment += payment.amount;
