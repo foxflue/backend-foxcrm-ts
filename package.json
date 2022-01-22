@@ -28,6 +28,7 @@
     "mongoose": "^6.1.7",
     "node-mongodump-s3": "^1.0.2",
     "nodemailer": "^6.7.2",
+    "razorpay": "^2.8.0",
     "yup": "^0.32.11"
   },
   "devDependencies": {
