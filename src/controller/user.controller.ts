@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { omit } from "lodash";
 import { User, UserDocument } from "./../model/user.model";
-import catchAsync from "./../utils/catchAsync.utils";
 // import Project from './../project/model.js';
-// import APIFeature from './../../utils/apiFeature.js';
+import APIFeature from "./../utils/apiFeture.utils";
+import catchAsync from "./../utils/catchAsync.utils";
 
 interface RegisterCredential {
   name: string;
@@ -17,21 +17,21 @@ type storeAndShowType = (
   next: NextFunction
 ) => object | void;
 
-// const index = catchAsync(async (req, res, next) => {
-//   const apiFeature = new APIFeature(User.find(), req.query)
-//     .filter()
-//     .search()
-//     .limitFields()
-//     .sort()
-//     .paginate();
-//   const users = await apiFeature.query;
+const index = catchAsync(async (req, res, next) => {
+  const apiFeature = new APIFeature(User.find(), req.query)
+    .filter()
+    .search()
+    .limitFields()
+    .sort()
+    .paginate();
+  const users = await apiFeature.query;
 
-//   res.status(200).json({
-//     status: 'success',
-//     results: users.length,
-//     data: users,
-//   });
-// });
+  res.status(200).json({
+    status: "success",
+    results: users.length,
+    data: users,
+  });
+});
 
 const store: storeAndShowType = catchAsync(async (req, res, next) => {
   await User.create(req.body as RegisterCredential);
@@ -101,7 +101,7 @@ const show: storeAndShowType = catchAsync(async (req, res, next) => {
 // );
 
 export default {
-  // index,
+  index,
   store,
   show,
   // destroy,

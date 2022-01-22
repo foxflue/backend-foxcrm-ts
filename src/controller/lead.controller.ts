@@ -1,8 +1,7 @@
 // import { validationResult } from 'express-validator';
 import { NextFunction, Request, Response } from "express";
-import { AppError } from "../utils/AppError.utils";
-// import APIFeatures from './../../utils/apiFeature.js';
 import Lead from "./../model/lead.model";
+import APIFeatures from "./../utils/apiFeture.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 import emailHolper from "./../utils/emailHandler.utils";
 
@@ -13,15 +12,18 @@ type leadType = (
 ) => void | object;
 
 const index: leadType = catchAsync(async (req, res, next) => {
-  const resources = await Lead.find();
+  const features = new APIFeatures(await Lead.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
-  if (resources.length <= 0) {
-    return next(new AppError("Resource not found.", 404));
-  }
+  const leads = await features.query;
 
   res.status(200).json({
     status: "success",
-    data: resources,
+    result: leads.length,
+    data: leads,
   });
 });
 

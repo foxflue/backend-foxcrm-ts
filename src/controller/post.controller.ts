@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Post, { PostDocument } from "./../model/post.model";
-// import APIFeatures from './../../utils/apiFeature.js';
+import APIFeatures from "./../utils/apiFeture.utils";
 import { AppError } from "./../utils/AppError.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 import hook from "./../utils/hook";
@@ -11,21 +11,26 @@ type postType = (
   next: NextFunction
 ) => void | object;
 
-// const index = catchAsync(async (req : Request, res : Response, next : NextFunction) => {
-//   const features = new APIFeatures(Post.find().select('-content'), req.query)
-//     .filter()
-//     .sort()
-//     .limitFields()
-//     .paginate();
+const index = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const features = new APIFeatures(
+      await Post.find().select("-content"),
+      req.query
+    )
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
 
-//   const posts = await features.query;
+    const posts = await features.query;
 
-//   res.status(200).json({
-//     status: 'success',
-//     results: posts.length,
-//     data: posts,
-//   });
-// });
+    res.status(200).json({
+      status: "success",
+      results: posts.length,
+      data: posts,
+    });
+  }
+);
 
 const store: postType = catchAsync(async (req, res, next) => {
   const post: PostDocument = await Post.create(req.body);
@@ -86,7 +91,7 @@ const destroy: postType = catchAsync(async (req, res, next) => {
 });
 
 export default {
-  // index,
+  index,
   store,
   show,
   update,

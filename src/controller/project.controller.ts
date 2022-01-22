@@ -1,6 +1,6 @@
-// import APIFeatures from './../../utils/apiFeature.js';
 import { NextFunction, Request, Response } from "express";
 import Project, { ProjectDocument } from "./../model/project.model";
+import APIFeatures from "./../utils/apiFeture.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 
 type projectType = (
@@ -9,24 +9,24 @@ type projectType = (
   next: NextFunction
 ) => object | void;
 
-// const index = catchAsync(async (req, res, next) => {
-//   const features = new APIFeatures(
-//     Project.find().populate('customer'),
-//     req.query
-//   )
-//     .filter()
-//     .limitFields()
-//     .sort()
-//     .paginate();
+const index = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(
+    Project.find().populate("customer"),
+    req.query
+  )
+    .filter()
+    .limitFields()
+    .sort()
+    .paginate();
 
-//   const projects = await features.query;
+  const projects = await features.query;
 
-//   res.status(200).json({
-//     status: 'success',
-//     results: projects.length,
-//     data: projects,
-//   });
-// });
+  res.status(200).json({
+    status: "success",
+    results: projects.length,
+    data: projects,
+  });
+});
 
 /**
  * Save a new project
@@ -127,7 +127,7 @@ const destroy: projectType = catchAsync(async (req, res, next) => {
 });
 
 export default {
-  // index,
+  index,
   show,
   store,
   update,

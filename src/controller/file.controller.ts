@@ -1,7 +1,7 @@
 import aws from "aws-sdk";
 import { NextFunction, Request, Response } from "express";
-// import APIFeatures from './../../utils/apiFeature.js';
 import File, { FileDocument } from "./../model/file.model";
+import APIFeatures from "./../utils/apiFeture.utils";
 import { AppError } from "./../utils/AppError.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 
@@ -17,21 +17,21 @@ const s3 = new aws.S3({
   region: Object(process.env).AWS_REGION,
 });
 
-// const index = catchAsync(async (req, res, next) => {
-//   const features = new APIFeatures(File.find(), req.query)
-//     .filter()
-//     .sort()
-//     .limitFields()
-//     .paginate();
+const index = catchAsync(async (req, res, next) => {
+  const features = new APIFeatures(await File.find(), req.query)
+    .filter()
+    .sort()
+    .limitFields()
+    .paginate();
 
-//   const files = await features.query;
+  const files = await features.query;
 
-//   res.status(200).json({
-//     status: 'success',
-//     results: files.length,
-//     data: files,
-//   });
-// });
+  res.status(200).json({
+    status: "success",
+    results: files.length,
+    data: files,
+  });
+});
 
 const store: fileType = catchAsync(async (req, res, next) => {
   // Store the file to AWS S3
@@ -101,7 +101,7 @@ const destroy: fileType = catchAsync(async (req, res, next) => {
 });
 
 export default {
-  //   index,
+  index,
   store,
   // getSignedUrl,
   destroy,
