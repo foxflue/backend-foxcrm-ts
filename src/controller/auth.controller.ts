@@ -1,10 +1,9 @@
-import bcrypt from "bcrypt";
-import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
 import { omit } from "lodash";
+import { forgotPasswordEmailContent } from "../emailContent/forgotPassword.emailContent";
 import { comparePassword } from "../utils/passwordEncrypt.utils";
 import { registeredEmailContent } from "./../emailContent/register.emailContent";
-import { User, UserDocument } from "./../model/user.model";
+import { User } from "./../model/user.model";
 import { AppError } from "./../utils/AppError.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 import emailHelper from "./../utils/emailHandler.utils";
@@ -92,17 +91,10 @@ const logout = catchAsync(
 );
 
 const verifyEmail: authType = catchAsync(async (req, res, next) => {
-  const token = req.params.token as string;
-
-  const encryptedVerificationToken: string = crypto
-    .createHash("sha256")
-    .update(token)
-    .digest("hex");
-
-  const user = (await User.findOne({
-    verification_token: encryptedVerificationToken,
+  const user = await User.findOne({
+    verification_token: await encryptedRandomString(req.params.token),
     verification_expire_at: { $gt: Date.now() },
-  })) as UserDocument;
+  });
 
   if (!user) {
     return next(
@@ -124,98 +116,71 @@ const verifyEmail: authType = catchAsync(async (req, res, next) => {
   });
 });
 
-// const forgotPassword: authType = catchAsync(async (req, res, next) => {
-//   const email = req.body.email as string;
+const forgotPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = await User.findOne({ email: req.body.email });
 
-//   const user = (await User.findOne({ email })) as UserDocument;
+    if (!user) {
+      return next(new AppError(`The user is not registered with us`, 404));
+    }
 
-//   if (!user) {
-//     return next(new AppError(`The user is not registered with us`, 404));
-//   }
+    const verificationToken = await hashString();
 
-//   const verificationToken: string = crypto.randomBytes(32).toString("hex");
+    user.reset_token = await encryptedRandomString(verificationToken);
+    user.reset_expiring_at = Date.now() + 20 * 60 * 1000; // 20 Minutes
 
-//   const encryptedVerificationToken: string = crypto
-//     .createHash("sha256")
-//     .update(verificationToken)
-//     .digest("hex");
+    await user.save();
 
-//   user.reset_token = encryptedVerificationToken;
-//   user.reset_expiring_at = Date.now() + 20 * 60 * 1000; // 20 Minutes
+    res.status(200).json({
+      status: "success",
+      message: "A verification email has been sent to the registered email",
+    });
 
-//   await user.save();
-
-//   res.status(200).json({
-//     status: "success",
-//     message: "A verification email has been sent to the registered email",
-//   });
-
-//   let emailContent = emailTemplate.replace("{{name}}", user.name);
-//   emailContent = emailContent.replace(
-//     "{{body}}",
-//     "You have requested to reset your password. Please click on the link below to reset your password"
-//   );
-//   emailContent = emailContent.replace(
-//     "{{link}}",
-//     `${process.env.FRONTEND}/auth/reset-password/${verificationToken}`
-//   );
-//   emailContent = emailContent.replace("{{btnLabel}}", "Reset Password");
-//   emailContent = emailContent.replace(
-//     "{{footerText}}",
-//     "if you didn't request to reset your password then ignore this email."
-//   );
-
-//   // Send Verification Email
-//   await emailHelper.sendEmail({
-//     email: user.email,
-//     subject: "Reset Password",
-//     body: emailContent,
-//   });
-// });
-
-const resetPassword: authType = catchAsync(async (req, res, next) => {
-  const token = req.params.token as string;
-  const { password, passwordConfirm } = req.body as resetData;
-
-  if (password !== passwordConfirm) {
-    return next(new AppError("Password dosen't match", 400));
+    // Send Verification Email
+    await emailHelper.sendEmail({
+      email: user.email,
+      subject: "Reset Password",
+      body: await forgotPasswordEmailContent(user.name, verificationToken),
+    });
   }
+);
 
-  const encryptedToken: string = crypto
-    .createHash("sha256")
-    .update(token)
-    .digest("hex");
+const resetPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { password, passwordConfirm } = req.body;
 
-  const user = (await User.findOne({
-    reset_token: encryptedToken,
-    reset_expire_at: {
-      $gt: Date.now(),
-    },
-  })) as UserDocument;
+    if (password !== passwordConfirm) {
+      return next(new AppError("Password dosen't match", 400));
+    }
 
-  if (!user) {
-    return next(
-      new AppError(
-        `The verification code is either wrong or expired. Please try again`,
-        403
-      )
-    );
+    const user = await User.findOne({
+      reset_token: await encryptedRandomString(req.params.token),
+      reset_expire_at: {
+        $gt: Date.now(),
+      },
+    });
+
+    if (!user) {
+      return next(
+        new AppError(
+          `The verification code is either wrong or expired. Please try again`,
+          403
+        )
+      );
+    }
+
+    user.reset_token = undefined;
+    user.reset_expiring_at = undefined;
+    user.password = password;
+
+    await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Password has been updated",
+    });
   }
-
-  user.reset_token = undefined;
-  user.reset_expiring_at = undefined;
-
-  // Hash the password
-  const passwordHash: string = await bcrypt.hash(password, 12);
-  user.password = passwordHash;
-
-  await user.save();
-
-  res.status(200).json({
-    status: "success",
-    message: "Password has been updated",
-  });
-});
+);
 
 export default {
   login,
@@ -223,6 +188,6 @@ export default {
   me,
   logout,
   verifyEmail,
-  // forgotPassword,
+  forgotPassword,
   resetPassword,
 };
