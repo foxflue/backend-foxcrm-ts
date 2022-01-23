@@ -1,4 +1,4 @@
-import { object, string } from "yup";
+import { object, ref, string } from "yup";
 
 export const authSchema = object({
   body: object({
@@ -15,8 +15,13 @@ export const authSchema = object({
     password: string()
       .trim()
       .required("Password is required.")
-      .min(6, "Password should be 6 chars minimum.")
-      .max(20, "Password should be 20 chars maximum"),
-    passwordConfirm: string().trim().required("Password Confirm is required."),
+      .matches(
+        /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/,
+        "Password must contain at least 8 characters, one uppercase, one number and one special case character"
+      ),
+    passwordConfirm: string()
+      .trim()
+      .required("Password Confirm is required.")
+      .oneOf([ref("password")], "Passwords don't match."),
   }),
 });
