@@ -2,20 +2,14 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
 import { omit } from "lodash";
+import { registeredEmailContent } from "./../emailContent/register.emailContent";
 import { User, UserDocument } from "./../model/user.model";
 import { AppError } from "./../utils/AppError.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 import emailHelper from "./../utils/emailHandler.utils";
+import { encryptedRandomString, hashString } from "./../utils/hashString.utils";
 import jwthelper from "./../utils/jwtHelper.utils";
-import emailTemplate from "./../view/email/template";
 
-interface RegisterCredential {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-  passwordConfirm: string;
-}
 interface LoginData {
   email: string;
   password: string;
@@ -63,60 +57,32 @@ const login: authType = catchAsync(async (req, res, next) => {
   });
 });
 
-const register: authType = catchAsync(async (req, res, next) => {
-  const { name, email, phone, password, passwordConfirm }: RegisterCredential =
-    req.body;
+const register = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // 1) generate a verification token
+    const verificationToken = await hashString();
+    req.body.verification_token = await encryptedRandomString(
+      verificationToken
+    );
+    req.body.verification_expiring_at = Date.now() + 10 * 60 * 60 * 1000;
 
-  if (password !== passwordConfirm) {
-    return next(new AppError("Passwords do not match", 400));
+    // User Create
+    const user = await User.create(req.body);
+
+    // Response
+    res.status(201).json({
+      status: "success",
+      data: user,
+    });
+
+    // Send Greetings Email
+    await emailHelper.sendEmail({
+      email: user.email,
+      subject: "Welcome to Foxflue",
+      body: registeredEmailContent(user.name, verificationToken),
+    });
   }
-
-  // Hash the password
-  const passwordHash = await bcrypt.hash(password, 12);
-
-  // Verification Token
-  const verificationToken = crypto.randomBytes(32).toString("hex");
-  const encryptedVerificationToken = crypto
-    .createHash("sha256")
-    .update(verificationToken)
-    .digest("hex");
-
-  const user = await User.create({
-    name,
-    email,
-    phone,
-    password: passwordHash,
-    verification_token: encryptedVerificationToken,
-    verification_expire_at: Date.now() + 10 * 60 * 60 * 1000,
-  });
-
-  res.status(201).json({
-    status: "success",
-    data: user,
-  });
-
-  let emailContent = emailTemplate.replace("{{name}}", user.name);
-  emailContent = emailContent.replace(
-    "{{body}}",
-    "Your Foxflue CRM account has been created. Now nothing can stop you from taking your business online"
-  );
-  emailContent = emailContent.replace(
-    "{{link}}",
-    `${Object(process.env).FRONTEND}/auth/verify-email/${verificationToken}`
-  );
-  emailContent = emailContent.replace("{{btnLabel}}", "Verify your email");
-  emailContent = emailContent.replace(
-    "{{footerText}}",
-    "if you didn't create the account then ignore this email."
-  );
-
-  // Send Greetings Email
-  await emailHelper.sendEmail({
-    email: user.email,
-    subject: "Welcome to Foxflue",
-    body: emailContent,
-  });
-});
+);
 
 const me: authType = catchAsync(async (req, res, next) => {
   res.status(200).json({
@@ -163,54 +129,54 @@ const verifyEmail: authType = catchAsync(async (req, res, next) => {
   });
 });
 
-const forgotPassword: authType = catchAsync(async (req, res, next) => {
-  const email = req.body.email as string;
+// const forgotPassword: authType = catchAsync(async (req, res, next) => {
+//   const email = req.body.email as string;
 
-  const user = (await User.findOne({ email })) as UserDocument;
+//   const user = (await User.findOne({ email })) as UserDocument;
 
-  if (!user) {
-    return next(new AppError(`The user is not registered with us`, 404));
-  }
+//   if (!user) {
+//     return next(new AppError(`The user is not registered with us`, 404));
+//   }
 
-  const verificationToken: string = crypto.randomBytes(32).toString("hex");
+//   const verificationToken: string = crypto.randomBytes(32).toString("hex");
 
-  const encryptedVerificationToken: string = crypto
-    .createHash("sha256")
-    .update(verificationToken)
-    .digest("hex");
+//   const encryptedVerificationToken: string = crypto
+//     .createHash("sha256")
+//     .update(verificationToken)
+//     .digest("hex");
 
-  user.reset_token = encryptedVerificationToken;
-  user.reset_expiring_at = Date.now() + 20 * 60 * 1000; // 20 Minutes
+//   user.reset_token = encryptedVerificationToken;
+//   user.reset_expiring_at = Date.now() + 20 * 60 * 1000; // 20 Minutes
 
-  await user.save();
+//   await user.save();
 
-  res.status(200).json({
-    status: "success",
-    message: "A verification email has been sent to the registered email",
-  });
+//   res.status(200).json({
+//     status: "success",
+//     message: "A verification email has been sent to the registered email",
+//   });
 
-  let emailContent = emailTemplate.replace("{{name}}", user.name);
-  emailContent = emailContent.replace(
-    "{{body}}",
-    "You have requested to reset your password. Please click on the link below to reset your password"
-  );
-  emailContent = emailContent.replace(
-    "{{link}}",
-    `${process.env.FRONTEND}/auth/reset-password/${verificationToken}`
-  );
-  emailContent = emailContent.replace("{{btnLabel}}", "Reset Password");
-  emailContent = emailContent.replace(
-    "{{footerText}}",
-    "if you didn't request to reset your password then ignore this email."
-  );
+//   let emailContent = emailTemplate.replace("{{name}}", user.name);
+//   emailContent = emailContent.replace(
+//     "{{body}}",
+//     "You have requested to reset your password. Please click on the link below to reset your password"
+//   );
+//   emailContent = emailContent.replace(
+//     "{{link}}",
+//     `${process.env.FRONTEND}/auth/reset-password/${verificationToken}`
+//   );
+//   emailContent = emailContent.replace("{{btnLabel}}", "Reset Password");
+//   emailContent = emailContent.replace(
+//     "{{footerText}}",
+//     "if you didn't request to reset your password then ignore this email."
+//   );
 
-  // Send Verification Email
-  await emailHelper.sendEmail({
-    email: user.email,
-    subject: "Reset Password",
-    body: emailContent,
-  });
-});
+//   // Send Verification Email
+//   await emailHelper.sendEmail({
+//     email: user.email,
+//     subject: "Reset Password",
+//     body: emailContent,
+//   });
+// });
 
 const resetPassword: authType = catchAsync(async (req, res, next) => {
   const token = req.params.token as string;
@@ -262,6 +228,6 @@ export default {
   me,
   logout,
   verifyEmail,
-  forgotPassword,
+  // forgotPassword,
   resetPassword,
 };

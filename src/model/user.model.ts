@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { encryptedPassword } from "../utils/passwordEncrypt.utils";
 
 export interface UserDocument extends mongoose.Document {
   name: string;
@@ -101,6 +102,18 @@ UserSchema.virtual("projects", {
   ref: "Project",
   localField: "_id",
   foreignField: "customer",
+});
+
+UserSchema.pre("save", async function (next) {
+  let user = this as UserDocument;
+
+  // only hash the password if it has been modified (or is new)
+  if (!user.isModified("password")) return next();
+
+  // hash password
+  user.password = await encryptedPassword(user.password);
+
+  next();
 });
 
 export const User = mongoose.model<UserDocument>("User", UserSchema);
