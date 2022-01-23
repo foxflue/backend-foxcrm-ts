@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { NextFunction, Request, Response } from "express";
 import { omit } from "lodash";
+import { comparePassword } from "../utils/passwordEncrypt.utils";
 import { registeredEmailContent } from "./../emailContent/register.emailContent";
 import { User, UserDocument } from "./../model/user.model";
 import { AppError } from "./../utils/AppError.utils";
@@ -10,11 +11,6 @@ import emailHelper from "./../utils/emailHandler.utils";
 import { encryptedRandomString, hashString } from "./../utils/hashString.utils";
 import jwthelper from "./../utils/jwtHelper.utils";
 
-interface LoginData {
-  email: string;
-  password: string;
-  rememberme: boolean;
-}
 interface resetData {
   password: string;
   passwordConfirm: string;
@@ -26,36 +22,31 @@ type authType = (
   next: NextFunction
 ) => void | object;
 
-const login: authType = catchAsync(async (req, res, next) => {
-  const { email, password, rememberme }: LoginData = req.body;
+const login = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // 1) Check if user exists && password is correct
+    const user = await User.findOne({ email: req.body.email }).select(
+      "+password"
+    );
 
-  // 1) Check if email and password exist
-  if (!email || !password) {
-    return next(new AppError("Please provide email and password!", 400));
+    if (!user || !(await comparePassword(req.body.password, user.password))) {
+      return next(new AppError("Invalid credentials!", 401));
+    }
+
+    // Create token
+    const token: string = await jwthelper.signToken(
+      user._id,
+      req.body.rememberme || false
+    );
+
+    // User response with token and user data
+    return res.status(200).json({
+      status: "success",
+      token: token,
+      data: omit(user.toJSON(), "password"),
+    });
   }
-
-  // 2) Check if user exists && password is correct
-  const user = (await User.findOne({ email }).select(
-    "+password"
-  )) as UserDocument;
-
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return next(new AppError("Invalid credentials!", 401));
-  }
-
-  // Create token
-  const token: string = await jwthelper.signToken(
-    user._id,
-    rememberme || false
-  );
-
-  // User response with token and user data
-  return res.status(200).json({
-    status: "success",
-    token: token,
-    data: omit(user.toJSON(), "password"),
-  });
-});
+);
 
 const register = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -79,22 +70,26 @@ const register = catchAsync(
     await emailHelper.sendEmail({
       email: user.email,
       subject: "Welcome to Foxflue",
-      body: registeredEmailContent(user.name, verificationToken),
+      body: await registeredEmailContent(user.name, verificationToken),
     });
   }
 );
 
-const me: authType = catchAsync(async (req, res, next) => {
-  res.status(200).json({
-    data: res.locals.user,
-  });
-});
+const me = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.status(200).json({
+      data: res.locals.user,
+    });
+  }
+);
 
-const logout: authType = catchAsync(async (req, res, next) => {
-  res.status(200).json({
-    message: "User has been logged out from the application",
-  });
-});
+const logout = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    res.status(200).json({
+      message: "User has been logged out from the application",
+    });
+  }
+);
 
 const verifyEmail: authType = catchAsync(async (req, res, next) => {
   const token = req.params.token as string;
