@@ -1,10 +1,8 @@
 import { NextFunction, Request, Response } from "express";
-import { omit } from "lodash";
 import { forgotPasswordEmailContent } from "../emailContent/forgotPassword.emailContent";
-import { comparePassword } from "../utils/passwordEncrypt.utils";
 import { registeredEmailContent } from "./../emailContent/register.emailContent";
 import { User } from "./../model/user.model";
-import { createUser } from "./../service/auth.service";
+import { createUser, LoginUser } from "./../service/auth.service";
 import { AppError } from "./../utils/AppError.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 import emailHelper from "./../utils/emailHandler.utils";
@@ -24,18 +22,14 @@ type authType = (
 
 const login = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // 1) Check if user exists && password is correct
-    const user = await User.findOne({ email: req.body.email }).select(
-      "+password"
-    );
-
-    if (!user || !(await comparePassword(req.body.password, user.password))) {
-      return next(new AppError("Invalid credentials!", 401));
-    }
+    const user = await LoginUser({
+      email: req.body.email,
+      password: req.body.password,
+    });
 
     // Create token
     const token: string = await jwthelper.signToken(
-      user._id,
+      Object(user).id,
       req.body.rememberme || false
     );
 
@@ -43,7 +37,7 @@ const login = catchAsync(
     return res.status(200).json({
       status: "success",
       token: token,
-      data: omit(user.toJSON(), "password"),
+      data: user,
     });
   }
 );
