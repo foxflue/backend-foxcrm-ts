@@ -4,6 +4,7 @@ import { forgotPasswordEmailContent } from "../emailContent/forgotPassword.email
 import { comparePassword } from "../utils/passwordEncrypt.utils";
 import { registeredEmailContent } from "./../emailContent/register.emailContent";
 import { User } from "./../model/user.model";
+import { createUser } from "./../service/auth.service";
 import { AppError } from "./../utils/AppError.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 import emailHelper from "./../utils/emailHandler.utils";
@@ -49,15 +50,8 @@ const login = catchAsync(
 
 const register = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // 1) generate a verification token
-    const verificationToken = await hashString();
-    req.body.verification_token = await encryptedRandomString(
-      verificationToken
-    );
-    req.body.verification_expiring_at = Date.now() + 10 * 60 * 60 * 1000;
-
     // User Create
-    const user = await User.create(req.body);
+    const { user, verificationToken } = await createUser(req.body);
 
     // Response
     res.status(201).json({
