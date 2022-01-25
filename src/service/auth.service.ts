@@ -125,6 +125,10 @@ export async function UserForgotPassword(query: FilterQuery<UserDocument>) {
       throw new AppError(`The user is not registered with us`, 404);
     }
 
+    if (user.verification_token || user.verification_expiring_at) {
+      throw new AppError("Please Verify your email.", 405);
+    }
+
     const verificationToken = await hashString();
 
     user.reset_token = await encryptedRandomString(verificationToken);
