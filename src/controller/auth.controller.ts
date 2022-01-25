@@ -4,23 +4,13 @@ import { registeredEmailContent } from "./../emailContent/register.emailContent"
 import {
   createUser,
   LoginUser,
+  ResendEmailForVerify,
   UserEmailVerification,
   UserForgotPassword,
   UserResetPassword,
 } from "./../service/auth.service";
 import catchAsync from "./../utils/catchAsync.utils";
 import emailHelper from "./../utils/emailHandler.utils";
-
-interface resetData {
-  password: string;
-  passwordConfirm: string;
-}
-
-type authType = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void | object;
 
 const login = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -85,7 +75,24 @@ const verifyEmail = catchAsync(
     });
   }
 );
+const resendVerifyEmail = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { user, verificationToken } = await ResendEmailForVerify(req.body);
 
+    // Response
+    res.status(201).json({
+      status: "success",
+      data: user,
+    });
+
+    // Send Greetings Email
+    await emailHelper.sendEmail({
+      email: user.email,
+      subject: "Welcome to Foxflue",
+      body: await registeredEmailContent(user.name, verificationToken),
+    });
+  }
+);
 const forgotPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { user, verificationToken } = await UserForgotPassword({
@@ -105,7 +112,6 @@ const forgotPassword = catchAsync(
     });
   }
 );
-
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     await UserResetPassword({
@@ -129,4 +135,5 @@ export default {
   verifyEmail,
   forgotPassword,
   resetPassword,
+  resendVerifyEmail,
 };

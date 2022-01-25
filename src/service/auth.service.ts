@@ -89,6 +89,34 @@ export async function UserEmailVerification(token: string) {
   }
 }
 
+export async function ResendEmailForVerify({
+  email,
+  password,
+}: {
+  email: UserDocument["email"];
+  password: string;
+}) {
+  try {
+    const user = (await User.findOne({ email }).select(
+      "+password"
+    )) as UserDocument;
+
+    if (!user || !(await comparePassword(password, user.password))) {
+      throw new AppError("Invalid credentials!", 401);
+    }
+
+    const verificationToken = await hashString();
+
+    user.verification_token = await encryptedRandomString(verificationToken);
+    user.verification_expiring_at = Date.now() + 10 * 60 * 60 * 1000;
+
+    await user.save();
+
+    return { user, verificationToken };
+  } catch (error) {
+    throw error;
+  }
+}
 export async function UserForgotPassword(query: FilterQuery<UserDocument>) {
   try {
     const user = (await User.findOne(query)) as UserDocument;
