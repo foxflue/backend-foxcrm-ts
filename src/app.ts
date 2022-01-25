@@ -1,6 +1,8 @@
 import * as dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
+import cron from "node-cron";
+import { DeleteFakeAccount } from "./../src/service/auth.service";
 import four04Route from "./common/404.error";
 import { globalErrorHandler } from "./common/error.controller";
 import authRoute from "./routes/auth.route";
@@ -32,6 +34,10 @@ try {
 }
 
 app.use(express.json());
+
+cron.schedule("01 00 24 * * *", () => {
+  DeleteFakeAccount();
+});
 
 app.use("/api/v2", authRoute);
 app.use("/api/v2", userRoute);

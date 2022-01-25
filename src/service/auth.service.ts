@@ -181,3 +181,16 @@ export async function UserResetPassword({
     throw error;
   }
 }
+
+export async function DeleteFakeAccount() {
+  try {
+    return await User.deleteMany({
+      verification_token: { $ne: undefined },
+      verification_expiring_at: {
+        $gt: new Date().getTime() - 1000 * 60 * 60 * 24 * 10,
+      },
+    });
+  } catch (error) {
+    throw error;
+  }
+}
