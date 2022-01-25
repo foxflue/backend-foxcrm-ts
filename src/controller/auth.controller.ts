@@ -1,12 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { forgotPasswordEmailContent } from "../emailContent/forgotPassword.emailContent";
 import { registeredEmailContent } from "./../emailContent/register.emailContent";
-import { User } from "./../model/user.model";
-import { createUser, LoginUser } from "./../service/auth.service";
-import { AppError } from "./../utils/AppError.utils";
+import {
+  createUser,
+  LoginUser,
+  UserEmailVerification,
+  UserForgotPassword,
+  UserResetPassword,
+} from "./../service/auth.service";
 import catchAsync from "./../utils/catchAsync.utils";
 import emailHelper from "./../utils/emailHandler.utils";
-import { encryptedRandomString, hashString } from "./../utils/hashString.utils";
 
 interface resetData {
   password: string;
@@ -72,29 +75,22 @@ const logout = catchAsync(
   }
 );
 
-// const verifyEmail: authType = catchAsync(async (req, res, next) => {
-//   await UserEmailVerification(req.params.token);
+const verifyEmail = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    await UserEmailVerification(req.params.token);
 
-//   res.status(200).json({
-//     status: "success",
-//     message: "Your email has been verified",
-//   });
-// });
+    res.status(200).json({
+      status: "success",
+      message: "Your email has been verified",
+    });
+  }
+);
 
 const forgotPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await User.findOne({ email: req.body.email });
-
-    if (!user) {
-      return next(new AppError(`The user is not registered with us`, 404));
-    }
-
-    const verificationToken = await hashString();
-
-    user.reset_token = await encryptedRandomString(verificationToken);
-    user.reset_expiring_at = Date.now() + 20 * 60 * 1000; // 20 Minutes
-
-    await user.save();
+    const { user, verificationToken } = await UserForgotPassword({
+      email: req.body.email,
+    });
 
     res.status(200).json({
       status: "success",
@@ -112,33 +108,11 @@ const forgotPassword = catchAsync(
 
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { password, passwordConfirm } = req.body;
-
-    if (password !== passwordConfirm) {
-      return next(new AppError("Password dosen't match", 400));
-    }
-
-    const user = await User.findOne({
-      reset_token: await encryptedRandomString(req.params.token),
-      reset_expire_at: {
-        $gt: Date.now(),
-      },
+    await UserResetPassword({
+      token: req.params.token,
+      password: req.body.password,
+      passwordConfirm: req.body.passwordConfirm,
     });
-
-    if (!user) {
-      return next(
-        new AppError(
-          `The verification code is either wrong or expired. Please try again`,
-          403
-        )
-      );
-    }
-
-    user.reset_token = undefined;
-    user.reset_expiring_at = undefined;
-    user.password = password;
-
-    await user.save();
 
     res.status(200).json({
       status: "success",
@@ -152,7 +126,7 @@ export default {
   register,
   me,
   logout,
-  // verifyEmail,
+  verifyEmail,
   forgotPassword,
   resetPassword,
 };

@@ -11,7 +11,7 @@ router.post("/auth/register", [validate(authSchema)], authController.register); 
 router.post("/auth/login", authController.login); // captcha
 router.get("/auth/user", authMiddleware.checkLogin, authController.me);
 router.post("/auth/logout", authMiddleware.checkLogin, authController.logout);
-// router.post("/auth/verify-email/:token", authController.verifyEmail);
+router.post("/auth/verify-email/:token", authController.verifyEmail);
 router.post(
   "/auth/forgot-password",
   //   [checkCaptcha],

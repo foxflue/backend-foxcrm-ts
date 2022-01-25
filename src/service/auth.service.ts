@@ -1,5 +1,5 @@
 import { omit } from "lodash";
-import { DocumentDefinition } from "mongoose";
+import { DocumentDefinition, FilterQuery } from "mongoose";
 import { AppError } from "../utils/AppError.utils";
 import { comparePassword } from "../utils/passwordEncrypt.utils";
 import { User, UserDocument } from "./../model/user.model";
@@ -47,7 +47,7 @@ export async function LoginUser({
 
     if (user.verification_token || user.verification_expiring_at) {
       throw new AppError(
-        "You need to verify your email, otherwise you won't get permit to login.",
+        "Please verify your email, or resend email verification request.",
         400
       );
     }
@@ -64,27 +64,88 @@ export async function LoginUser({
   }
 }
 
-// export async function UserEmailVerification(token: string) {
-//   try {
-//     const user = await User.findOne({
-//       verification_token: await encryptedRandomString(token),
-//       verification_expire_at: { $gt: Date.now() },
-//     });
+export async function UserEmailVerification(token: string) {
+  try {
+    const user = await User.findOne({
+      verification_token: await encryptedRandomString(token),
+      verification_expiring_at: { $gt: Date.now() },
+    });
 
-//     if (!user) {
-//       return new AppError(
-//         "Your verification token is either expired or invalid or you are already verified.",
-//         400
-//       );
-//     }
+    if (!user) {
+      throw new AppError(
+        "Your verification token is either expired or invalid or you are already verified.",
+        400
+      );
+    }
 
-//     user.verification_token = undefined;
-//     user.verification_expiring_at = undefined;
+    user.verification_token = undefined;
+    user.verification_expiring_at = undefined;
 
-//     await user.save();
+    await user.save();
 
-//     return true;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function UserForgotPassword(query: FilterQuery<UserDocument>) {
+  try {
+    const user = (await User.findOne(query)) as UserDocument;
+
+    if (!user) {
+      throw new AppError(`The user is not registered with us`, 404);
+    }
+
+    const verificationToken = await hashString();
+
+    user.reset_token = await encryptedRandomString(verificationToken);
+    user.reset_expiring_at = Date.now() + 20 * 60 * 1000; // 20 Minutes
+
+    await user.save();
+
+    return { user, verificationToken };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function UserResetPassword({
+  token,
+  password,
+  passwordConfirm,
+}: {
+  token: string;
+  password: string;
+  passwordConfirm: string;
+}) {
+  try {
+    if (password !== passwordConfirm) {
+      throw new AppError("Password dosen't match", 400);
+    }
+
+    const user = await User.findOne({
+      reset_token: await encryptedRandomString(token),
+      reset_expiring_at: {
+        $gt: Date.now(),
+      },
+    });
+
+    if (!user) {
+      throw new AppError(
+        `The verification code is either wrong or expired. Please try again`,
+        403
+      );
+    }
+
+    user.reset_token = undefined;
+    user.reset_expiring_at = undefined;
+    user.password = password;
+
+    await user.save();
+
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
