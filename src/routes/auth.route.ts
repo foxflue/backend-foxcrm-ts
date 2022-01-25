@@ -27,5 +27,11 @@ router.post(
   [validate(userPasswordSchema)],
   authController.resetPassword
 );
+router.post(
+  "/auth/password-change",
+  [authMiddleware.checkLogin],
+  [validate(userPasswordSchema)],
+  authController.changePassword
+);
 
 export default router;

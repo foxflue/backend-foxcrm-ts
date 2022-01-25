@@ -5,6 +5,7 @@ import {
   createUser,
   LoginUser,
   ResendEmailForVerify,
+  UpdatePassword,
   UserEmailVerification,
   UserForgotPassword,
   UserResetPassword,
@@ -127,6 +128,20 @@ const resetPassword = catchAsync(
   }
 );
 
+const changePassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    await UpdatePassword({
+      id: res.locals.user._id,
+      oldPassword: req.body.oldPassword,
+      password: req.body.password,
+      passwordConfirm: req.body.passwordConfirm,
+    });
+    res.status(200).json({
+      status: "success",
+      message: "Password has been updated",
+    });
+  }
+);
 export default {
   login,
   register,
@@ -136,4 +151,5 @@ export default {
   forgotPassword,
   resetPassword,
   resendVerifyEmail,
+  changePassword,
 };

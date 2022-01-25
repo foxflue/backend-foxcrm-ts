@@ -194,3 +194,33 @@ export async function DeleteFakeAccount() {
     throw error;
   }
 }
+
+export async function UpdatePassword({
+  id,
+  oldPassword,
+  password,
+  passwordConfirm,
+}: {
+  id: string;
+  oldPassword: string;
+  password: string;
+  passwordConfirm: string;
+}) {
+  try {
+    if (password !== passwordConfirm) {
+      throw new AppError("Password should be match.", 400);
+    }
+    const user = await User.findById(id).select("+password");
+
+    if (!user || !(await comparePassword(oldPassword, user.password))) {
+      throw new AppError("Invalid Credentials.", 400);
+    }
+    user.password = password;
+
+    await user.save();
+
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
