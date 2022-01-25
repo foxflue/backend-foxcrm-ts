@@ -35,7 +35,7 @@ try {
 
 app.use(express.json());
 
-cron.schedule("01 00 24 * * *", () => {
+cron.schedule("01 0 0 * * *", () => {
   DeleteFakeAccount();
 });
 

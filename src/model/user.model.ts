@@ -10,7 +10,7 @@ export interface UserDocument extends mongoose.Document {
   address: AddressDocument;
   role: string;
   verification_token: string | undefined;
-  verification_expiring_at: Date | undefined;
+  verification_expiring_at: number | undefined;
   reset_token: string | undefined;
   reset_expiring_at: number | undefined;
   createdAt: Date;
