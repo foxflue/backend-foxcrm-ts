@@ -7,7 +7,6 @@ import { AppError } from "./../utils/AppError.utils";
 import catchAsync from "./../utils/catchAsync.utils";
 import emailHelper from "./../utils/emailHandler.utils";
 import { encryptedRandomString, hashString } from "./../utils/hashString.utils";
-import jwthelper from "./../utils/jwtHelper.utils";
 
 interface resetData {
   password: string;
@@ -22,19 +21,14 @@ type authType = (
 
 const login = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await LoginUser({
+    const { user, token } = await LoginUser({
       email: req.body.email,
       password: req.body.password,
+      rememberme: req.body.rememberme,
     });
 
-    // Create token
-    const token: string = await jwthelper.signToken(
-      Object(user).id,
-      req.body.rememberme || false
-    );
-
     // User response with token and user data
-    return res.status(200).json({
+    res.status(200).json({
       status: "success",
       token: token,
       data: user,
@@ -78,31 +72,14 @@ const logout = catchAsync(
   }
 );
 
-const verifyEmail: authType = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({
-    verification_token: await encryptedRandomString(req.params.token),
-    verification_expire_at: { $gt: Date.now() },
-  });
+// const verifyEmail: authType = catchAsync(async (req, res, next) => {
+//   await UserEmailVerification(req.params.token);
 
-  if (!user) {
-    return next(
-      new AppError(
-        `Your verification token is either expired or invalid or you are already verified`,
-        400
-      )
-    );
-  }
-
-  user.verification_token = undefined;
-  user.verification_expiring_at = undefined;
-
-  await user.save();
-
-  res.status(200).json({
-    status: "success",
-    message: "Your email has been verified",
-  });
-});
+//   res.status(200).json({
+//     status: "success",
+//     message: "Your email has been verified",
+//   });
+// });
 
 const forgotPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -175,7 +152,7 @@ export default {
   register,
   me,
   logout,
-  verifyEmail,
+  // verifyEmail,
   forgotPassword,
   resetPassword,
 };

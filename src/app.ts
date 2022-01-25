@@ -41,8 +41,9 @@ app.use("/api/v2", leadRoute);
 app.use("/api/v2", fileRoute);
 app.use("/api/v2", dashboardRoute);
 app.use("/api/v2", paymentRoute);
-app.use(four04Route);
+
 app.use(globalErrorHandler);
+app.use(four04Route);
 
 app.listen(PORT, HOST, () => {
   console.log(`Server running on http://${HOST}:${PORT}`);
