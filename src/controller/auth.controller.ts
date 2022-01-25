@@ -4,6 +4,7 @@ import { registeredEmailContent } from "./../emailContent/register.emailContent"
 import {
   createUser,
   LoginUser,
+  OAuthLogin,
   ResendEmailForVerify,
   UpdatePassword,
   UserEmailVerification,
@@ -142,6 +143,18 @@ const changePassword = catchAsync(
     });
   }
 );
+
+const socialLogin = catchAsync(async (req, res, next) => {
+  const access_token = await OAuthLogin({
+    id: req.params.id,
+    code: req.body.code,
+    client_id: req.body.client_id,
+    redirect_uri: req.body.redirect_uri,
+  });
+
+  res.status(200).json(access_token);
+});
+
 export default {
   login,
   register,
@@ -152,4 +165,5 @@ export default {
   resetPassword,
   resendVerifyEmail,
   changePassword,
+  socialLogin,
 };

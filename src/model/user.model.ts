@@ -6,6 +6,7 @@ export interface UserDocument extends mongoose.Document {
   email: string;
   phone: string;
   password: string;
+  oauth_id: string;
   company: string;
   address: AddressDocument;
   role: string;
@@ -43,6 +44,9 @@ const UserSchema = new mongoose.Schema(
     password: {
       type: String,
       select: false,
+    },
+    oauth_id: {
+      type: String,
     },
     company: {
       type: String,
