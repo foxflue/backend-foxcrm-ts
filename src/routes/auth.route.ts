@@ -13,8 +13,14 @@ router.post(
   authController.register
 ); // captcha
 router.post("/auth/login", authController.login); // captcha
+router.post("/auth/oauth-login/:id", authController.socialLogin);
+router.post(
+  "/auth/two-fa",
+  [authMiddleware.checkLogin],
+  authController.set2FAMode
+);
+router.post("/auth/two-fa-verify/:id", authController.verify2FASecret);
 router.get("/auth/user", authMiddleware.checkLogin, authController.me);
-router.post("/auth/logout", authMiddleware.checkLogin, authController.logout);
 router.post("/auth/verify-email/:token", authController.verifyEmail);
 router.post("/auth/resend-verify-email", authController.resendVerifyEmail);
 router.post(
@@ -34,4 +40,5 @@ router.post(
   authController.changePassword
 );
 
+router.post("/auth/logout", authMiddleware.checkLogin, authController.logout);
 export default router;

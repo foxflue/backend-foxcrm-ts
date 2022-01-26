@@ -1,5 +1,6 @@
 import { omit } from "lodash";
 import { DocumentDefinition, FilterQuery } from "mongoose";
+import speakeasy from "speakeasy";
 import { AppError } from "../utils/AppError.utils";
 import { comparePassword } from "../utils/passwordEncrypt.utils";
 import { User, UserDocument } from "./../model/user.model";
@@ -57,13 +58,34 @@ export async function LoginUser({
         400
       );
     }
+    if (user.two_fa.mode && user.two_fa.base32) {
+      const secretToken = speakeasy.totp({
+        secret: user.two_fa.base32,
+        encoding: "base32",
+        time: 120,
+      });
+
+      return {
+        user,
+        token: undefined,
+        secretToken,
+      };
+    }
 
     // Create token
     const token = await jwtHelper.signToken(user.id, rememberme || false);
 
     return {
-      user: omit(user.toJSON(), "password", "createdAt", "updatedAt", "__v"),
+      user: omit(
+        user.toJSON(),
+        "password",
+        "createdAt",
+        "updatedAt",
+        "__v",
+        "two_fa"
+      ),
       token,
+      secretToken: undefined,
     };
   } catch (error) {
     throw error;
@@ -307,6 +329,63 @@ export async function OAuthLogin({
     const token = await jwtHelper.signToken(user._id, true);
 
     return token;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function SetTwoFA({ id, mode }: { id: string; mode: boolean }) {
+  try {
+    let user = (await User.findById(id)) as UserDocument;
+
+    if (mode) {
+      user.two_fa.base32 = await speakeasy.generateSecret().base32;
+      user.two_fa.mode = true;
+    } else {
+      user.two_fa.base32 = undefined;
+      user.two_fa.mode = false;
+    }
+
+    await user.save();
+
+    return;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function VerifySecret(id: string, otp: string) {
+  try {
+    const user = await User.findById(id);
+
+    if (!user || !user.two_fa.base32) {
+      throw new AppError("Invalid Request.", 406);
+    }
+
+    const isValid = speakeasy.totp.verify({
+      secret: user.two_fa.base32,
+      encoding: "base32",
+      token: otp,
+      time: 120,
+    });
+
+    if (!isValid) {
+      throw new AppError("Invalid Input.", 406);
+    }
+
+    const token = jwtHelper.signToken(user._id, false);
+
+    return {
+      user: omit(
+        user.toJSON(),
+        "password",
+        "createdAt",
+        "updatedAt",
+        "__v",
+        "two_fa"
+      ),
+      token,
+    };
   } catch (error) {
     throw error;
   }
