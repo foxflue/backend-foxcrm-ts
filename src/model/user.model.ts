@@ -7,6 +7,10 @@ export interface UserDocument extends mongoose.Document {
   phone: string;
   password: string;
   oauth_id: string;
+  two_fa: {
+    mode: boolean;
+    base32: string | undefined;
+  };
   company: string;
   address: AddressDocument;
   role: string;
@@ -47,6 +51,10 @@ const UserSchema = new mongoose.Schema(
     },
     oauth_id: {
       type: String,
+    },
+    two_fa: {
+      mode: Boolean,
+      base32: String,
     },
     company: {
       type: String,
