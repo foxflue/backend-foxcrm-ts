@@ -2,16 +2,13 @@ import { omit } from "lodash";
 import { DocumentDefinition, FilterQuery } from "mongoose";
 import speakeasy from "speakeasy";
 import { AppError } from "../utils/AppError.utils";
+import { loginWithGithub } from "../utils/OAuth/github.oauth";
 import { comparePassword } from "../utils/passwordEncrypt.utils";
 import { User, UserDocument } from "./../model/user.model";
 import { encryptedRandomString, hashString } from "./../utils/hashString.utils";
 import jwtHelper from "./../utils/jwtHelper.utils";
-import {
-  loginWithFacebook,
-  loginWithGithub,
-  loginWithGoogle,
-  upsertUser,
-} from "./../utils/oAuth.utils";
+import { loginWithFacebook } from "./../utils/OAuth/facebook.oauth";
+import { loginWithGoogle } from "./../utils/OAuth/google.oauth";
 
 export async function createUser(input: DocumentDefinition<UserDocument>) {
   try {
@@ -269,55 +266,28 @@ export async function OAuthLogin({
 
     switch (id) {
       case "google":
-        const googleUser = await loginWithGoogle(code, client_id, redirect_uri);
-        console.log(googleUser);
-        if (!googleUser.email_verified) {
-          throw new AppError(
-            "Unable to create account: Unverified google account",
-            406
-          );
-        }
-        user = (await upsertUser(
-          googleUser.sub,
-          googleUser.email,
-          googleUser.name
+        user = (await loginWithGoogle(
+          code,
+          client_id,
+          redirect_uri
         )) as UserDocument;
         break;
 
       case "facebook":
-        const facebookUser = await loginWithFacebook(
+        user = (await loginWithFacebook(
           code,
           client_id,
           redirect_uri
-        );
-        console.log(facebookUser);
-        if (!facebookUser.email && !facebookUser.id) {
-          throw new AppError(
-            "Unable to create account: Facebook account does not have email",
-            400
-          );
-        }
-        user = (await upsertUser(
-          facebookUser.id,
-          facebookUser.email,
-          facebookUser.name
         )) as UserDocument;
         break;
 
       case "github":
-        const githubUser = await loginWithGithub(code, client_id, redirect_uri);
-        console.log(githubUser);
-        if (!githubUser.email) {
-          throw new AppError(
-            "Unable to create account: Unverified amazon account",
-            406
-          );
-        }
-        user = (await upsertUser(
-          githubUser.id,
-          githubUser.email,
-          githubUser.name
+        user = (await loginWithGithub(
+          code,
+          client_id,
+          redirect_uri
         )) as UserDocument;
+
         break;
     }
 
