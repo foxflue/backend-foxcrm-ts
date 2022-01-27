@@ -13,7 +13,7 @@ export interface UserDocument extends mongoose.Document {
   };
   company: string;
   address: AddressDocument;
-  role: string;
+  roles: string[];
   verification_token: string | undefined;
   verification_expiring_at: number | undefined;
   reset_token: string | undefined;
@@ -78,10 +78,10 @@ const UserSchema = new mongoose.Schema(
         type: Number,
       },
     },
-    role: {
-      type: String,
-      enum: ["user", "manager", "admin"],
-      default: "user",
+    roles: {
+      type: [String],
+      enum: ["user", "employee", "manager", "admin"],
+      default: ["user"],
     },
     verification_token: {
       type: String,

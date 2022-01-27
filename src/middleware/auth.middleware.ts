@@ -49,7 +49,8 @@ const checkLogin = catchAsync(
 
 const checkAdmin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    if (res.locals.user.role !== "admin") {
+    const user = res.locals.user.roles;
+    if (!user.includes("admin")) {
       return res.status(401).json({
         status: "fail",
         message: "Unauthorized Request",
@@ -60,4 +61,32 @@ const checkAdmin = catchAsync(
   }
 );
 
-export default { checkLogin, checkAdmin };
+const checkManager = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = res.locals.user.roles;
+    if (!user.includes("manager")) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Unauthorized Request",
+      });
+    }
+
+    next();
+  }
+);
+
+const checkEmployee = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = res.locals.user.roles;
+    if (!user.includes("employee")) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Unauthorized Request",
+      });
+    }
+
+    next();
+  }
+);
+
+export default { checkLogin, checkAdmin, checkManager, checkEmployee };
