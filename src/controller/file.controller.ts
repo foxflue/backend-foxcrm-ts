@@ -1,46 +1,30 @@
-import aws from "aws-sdk";
 import { NextFunction, Request, Response } from "express";
-import File, { FileDocument } from "./../model/file.model";
-import APIFeatures from "./../utils/apiFeture.utils";
-import { AppError } from "./../utils/AppError.utils";
+import { CreateFile, DeleteFile, FetchAllFile } from "../service/file.service";
 import catchAsync from "./../utils/catchAsync.utils";
 
-type fileType = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => void | object;
+const index = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const files = await FetchAllFile(req.body);
 
-const s3 = new aws.S3({
-  accessKeyId: Object(process.env).AWS_ACCESS_KEY_ID,
-  secretAccessKey: Object(process.env).AWS_SECRET_ACCESS_KEY,
-  region: Object(process.env).AWS_REGION,
-});
+    res.status(200).json({
+      status: "success",
+      results: files.length,
+      data: files,
+    });
+  }
+);
 
-const index = catchAsync(async (req, res, next) => {
-  const features = new APIFeatures(File.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
+const store = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Store the file to AWS S3
+    const file = await CreateFile(req.body);
 
-  const files = await features.query;
-
-  res.status(200).json({
-    status: "success",
-    results: files.length,
-    data: files,
-  });
-});
-
-const store: fileType = catchAsync(async (req, res, next) => {
-  // Store the file to AWS S3
-  const file: FileDocument = await File.create(req.body);
-  res.status(201).json({
-    status: "success",
-    data: file,
-  });
-});
+    res.status(201).json({
+      status: "success",
+      data: file,
+    });
+  }
+);
 
 // Get signed url from AWS S3
 // const getSignedUrl: fileType = catchAsync(async (req, res, next) => {
@@ -74,31 +58,17 @@ const store: fileType = catchAsync(async (req, res, next) => {
 // });
 
 // Delete file
-const destroy: fileType = catchAsync(async (req, res, next) => {
-  const file = (await File.findById(req.params.id as string)) as FileDocument;
 
-  if (!file) {
-    return next(new AppError("No file found with that ID", 404));
+const destroy = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    await DeleteFile(req.params.id);
+
+    res.status(200).json({
+      status: "success",
+      data: null,
+    });
   }
-
-  const params = {
-    Bucket: Object(process.env).AWS_BUCKET_NAME,
-    Key: file.path,
-  };
-
-  s3.deleteObject(params, (err, data) => {
-    if (err) {
-      return next(new AppError("Could not delete file", 500));
-    }
-  });
-
-  await file.remove();
-
-  res.status(200).json({
-    status: "success",
-    data: null,
-  });
-});
+);
 
 export default {
   index,
