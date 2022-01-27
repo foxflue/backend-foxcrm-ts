@@ -10,11 +10,7 @@ router
   .post(authMiddleware.checkLogin, paymentController.store);
 router
   .route("/payment/:id")
-  .get([authMiddleware.checkLogin], paymentController.show)
-  .patch(
-    [authMiddleware.checkLogin, authMiddleware.checkAdmin],
-    paymentController.update
-  );
+  .get([authMiddleware.checkLogin], paymentController.show);
 
 router.post(
   "/payment/verify/:id",
