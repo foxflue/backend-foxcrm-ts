@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "../utils/slugify";
 
 export interface PostDocument extends mongoose.Document {
   type: string;
@@ -73,6 +74,13 @@ const PostSchema = new mongoose.Schema(
 );
 
 PostSchema.index({ slug: 1 });
+
+PostSchema.pre("save", async function (next) {
+  let post = this as PostDocument;
+
+  post.slug = await slugify(post.title);
+  next();
+});
 
 const Post = mongoose.model<PostDocument>("Post", PostSchema);
 
