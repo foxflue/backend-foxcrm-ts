@@ -4,9 +4,8 @@ export interface LeadDocument extends mongoose.Document {
   name: string;
   email: string;
   message: string;
-  meta: {
-    purpose: string;
-  };
+  purpose: string;
+  meta: object;
   createdAt: Date;
 }
 
