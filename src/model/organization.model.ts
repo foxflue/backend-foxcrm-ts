@@ -2,6 +2,7 @@ import { Document, model, Schema } from "mongoose";
 
 export interface OrganizationDocument extends Document {
   _id: string;
+  title: string;
   email: string;
   phone: string;
   about: string;
@@ -13,6 +14,10 @@ export interface OrganizationDocument extends Document {
 
 const organizationSchema = new Schema(
   {
+    title: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
