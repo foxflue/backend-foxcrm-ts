@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import slugify from "../utils/slugify";
 
-export interface PostDocument extends mongoose.Document {
+export interface PostDocument extends Document {
   type: string;
   title: string;
   slug: string;
@@ -18,7 +18,7 @@ export interface PostDocument extends mongoose.Document {
   updatedAt: Date;
 }
 
-const PostSchema = new mongoose.Schema(
+const PostSchema = new Schema(
   {
     type: {
       type: String,
@@ -82,6 +82,4 @@ PostSchema.pre("save", async function (next) {
   next();
 });
 
-const Post = mongoose.model<PostDocument>("Post", PostSchema);
-
-export default Post;
+const Post = model<PostDocument>("Post", PostSchema);

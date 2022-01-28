@@ -41,9 +41,7 @@ const organizationSchema = new Schema(
   }
 );
 
-const Organization = model<OrganizationDocument>(
+export const Organization = model<OrganizationDocument>(
   "Organization",
   organizationSchema
 );
-
-export default Organization;

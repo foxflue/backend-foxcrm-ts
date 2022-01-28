@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import { UserDocument } from "./user.model";
 
-export interface ProjectDocument extends mongoose.Document {
+export interface ProjectDocument extends Document {
   title: string;
   content: string;
   entities: string[];
@@ -17,7 +17,7 @@ export interface ProjectDocument extends mongoose.Document {
   updatedAt: Date;
 }
 
-const ProjectSchema = new mongoose.Schema(
+const ProjectSchema = new Schema(
   {
     title: {
       type: String,
@@ -35,7 +35,7 @@ const ProjectSchema = new mongoose.Schema(
       },
     ],
     customer: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: [true, "Customer is required"],
     },
@@ -103,6 +103,4 @@ ProjectSchema.virtual("payments", {
 //   return this.price ? (this.price - totalPayment).toFixed(2) : 0;
 // });
 
-const Project = mongoose.model<ProjectDocument>("Project", ProjectSchema);
-
-export default Project;
+export const Project = model<ProjectDocument>("Project", ProjectSchema);

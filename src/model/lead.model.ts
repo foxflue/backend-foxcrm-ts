@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import { Document, model, Schema } from "mongoose";
 
-export interface LeadDocument extends mongoose.Document {
+export interface LeadDocument extends Document {
   name: string;
   email: string;
   message: string;
@@ -9,7 +9,7 @@ export interface LeadDocument extends mongoose.Document {
   createdAt: Date;
 }
 
-const LeadSchema = new mongoose.Schema(
+const LeadSchema = new Schema(
   {
     name: {
       type: String,
@@ -34,6 +34,4 @@ const LeadSchema = new mongoose.Schema(
   }
 );
 
-const Lead = mongoose.model<LeadDocument>("Lead", LeadSchema);
-
-export default Lead;
+export const Lead = model<LeadDocument>("Lead", LeadSchema);

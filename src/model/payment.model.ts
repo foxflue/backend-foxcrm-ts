@@ -1,8 +1,8 @@
-import mongoose from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import { ProjectDocument } from "./project.model";
 import { UserDocument } from "./user.model";
 
-export interface PaymentDocument extends mongoose.Document {
+export interface PaymentDocument extends Document {
   project: ProjectDocument["_id"];
   customer: UserDocument["_id"];
   gateway: object;
@@ -14,15 +14,15 @@ export interface PaymentDocument extends mongoose.Document {
   updatedAt: Date;
 }
 
-const PaymentSchema = new mongoose.Schema(
+const PaymentSchema = new Schema(
   {
     project: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Project",
       required: [true, "Project is required"],
     },
     customer: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
       required: [true, "Customer is required"],
     },
@@ -56,6 +56,4 @@ const PaymentSchema = new mongoose.Schema(
   }
 );
 
-const Payment = mongoose.model<PaymentDocument>("Payment", PaymentSchema);
-
-export default Payment;
+const Payment = model<PaymentDocument>("Payment", PaymentSchema);

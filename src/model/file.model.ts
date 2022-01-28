@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
+import { Document, model, Schema } from "mongoose";
 
-export interface FileDocument extends mongoose.Document {
+export interface FileDocument extends Document {
   path: string;
   createdAt: string;
 }
 
-const FileSchema = new mongoose.Schema(
+const FileSchema = new Schema(
   {
     path: {
       type: String,
@@ -19,6 +19,4 @@ const FileSchema = new mongoose.Schema(
   }
 );
 
-const File = mongoose.model<FileDocument>("File", FileSchema);
-
-export default File;
+export const File = model<FileDocument>("File", FileSchema);

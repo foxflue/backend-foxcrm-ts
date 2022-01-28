@@ -1,7 +1,7 @@
-import mongoose from "mongoose";
+import { Document, model, Schema } from "mongoose";
 import { encryptedPassword } from "../utils/passwordEncrypt.utils";
 
-export interface UserDocument extends mongoose.Document {
+export interface UserDocument extends Document {
   name: string;
   email: string;
   phone: string;
@@ -30,7 +30,7 @@ export interface AddressDocument {
   zipcode: number;
 }
 
-const UserSchema = new mongoose.Schema(
+const UserSchema = new Schema(
   {
     name: {
       type: String,
@@ -128,4 +128,4 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-export const User = mongoose.model<UserDocument>("User", UserSchema);
+export const User = model<UserDocument>("User", UserSchema);
