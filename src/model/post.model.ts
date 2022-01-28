@@ -82,4 +82,4 @@ PostSchema.pre("save", async function (next) {
   next();
 });
 
-const Post = model<PostDocument>("Post", PostSchema);
+export const Post = model<PostDocument>("Post", PostSchema);

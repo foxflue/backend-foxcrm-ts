@@ -1,4 +1,4 @@
-import Project from "../model/project.model";
+import { Project } from "../model/project.model";
 import { User } from "./../model/user.model";
 import APIFeature from "./../utils/apiFeture.utils";
 

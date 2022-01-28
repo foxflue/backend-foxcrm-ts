@@ -1,6 +1,6 @@
 import { DocumentDefinition } from "mongoose";
 import APIFeatures from "../utils/apiFeture.utils";
-import Lead, { LeadDocument } from "./../model/lead.model";
+import { Lead, LeadDocument } from "./../model/lead.model";
 
 export async function CreateLead(input: DocumentDefinition<LeadDocument>) {
   try {

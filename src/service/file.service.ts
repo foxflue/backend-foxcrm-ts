@@ -2,7 +2,7 @@ import aws from "aws-sdk";
 import { DocumentDefinition } from "mongoose";
 import APIFeatures from "../utils/apiFeture.utils";
 import { AppError } from "../utils/AppError.utils";
-import File, { FileDocument } from "./../model/file.model";
+import { File, FileDocument } from "./../model/file.model";
 
 const s3 = new aws.S3({
   accessKeyId: Object(process.env).AWS_ACCESS_KEY_ID,

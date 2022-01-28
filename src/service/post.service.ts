@@ -1,5 +1,5 @@
 import { DocumentDefinition, FilterQuery } from "mongoose";
-import Post, { PostDocument } from "../model/post.model";
+import { Post, PostDocument } from "../model/post.model";
 import APIFeatures from "../utils/apiFeture.utils";
 import { AppError } from "../utils/AppError.utils";
 import hook from "../utils/hook";

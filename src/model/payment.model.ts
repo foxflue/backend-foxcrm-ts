@@ -56,4 +56,4 @@ const PaymentSchema = new Schema(
   }
 );
 
-const Payment = model<PaymentDocument>("Payment", PaymentSchema);
+export const Payment = model<PaymentDocument>("Payment", PaymentSchema);

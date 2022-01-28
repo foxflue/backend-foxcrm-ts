@@ -2,9 +2,9 @@ import crypto from "crypto";
 import { Response } from "express";
 import { DocumentDefinition } from "mongoose";
 import razorpay from "razorpay";
-import Payment, { PaymentDocument } from "../model/payment.model";
+import { Payment, PaymentDocument } from "../model/payment.model";
 import { AppError } from "../utils/AppError.utils";
-import Project, { ProjectDocument } from "./../model/project.model";
+import { Project, ProjectDocument } from "./../model/project.model";
 import APIFeatures from "./../utils/apiFeture.utils";
 
 export async function CreatePayment(

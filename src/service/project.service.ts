@@ -1,5 +1,5 @@
 import { DocumentDefinition } from "mongoose";
-import Project, { ProjectDocument } from "../model/project.model";
+import { Project, ProjectDocument } from "../model/project.model";
 import APIFeatures from "../utils/apiFeture.utils";
 import { AppError } from "../utils/AppError.utils";
 
