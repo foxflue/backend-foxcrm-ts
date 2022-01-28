@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import Project from "../model/project.model";
+import { Project } from "../model/project.model";
 import { User } from "../model/user.model";
 import catchAsync from "../utils/catchAsync.utils";
 
