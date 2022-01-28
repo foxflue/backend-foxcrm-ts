@@ -1,6 +1,6 @@
-import emailTemplate from "./../view/email/template";
+import emailTemplate from "../view/email/template";
 
-export const registeredEmailContent = async (
+export const authRegisteredEmail = async (
   name: string,
   verificationToken: string
 ) => {

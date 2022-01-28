@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { forgotPasswordEmailContent } from "../emailContent/forgotPassword.emailContent";
+import { authRegisteredEmail } from "./../emailContent/auth.registered.emailContent";
 import { loginEmailContent } from "./../emailContent/login.emailContent";
-import { registeredEmailContent } from "./../emailContent/register.emailContent";
 import {
   createUser,
   LoginUser,
@@ -59,7 +59,7 @@ const register = catchAsync(
     await emailHelper.sendEmail({
       email: user.email,
       subject: "Welcome to Foxflue",
-      body: await registeredEmailContent(user.name, verificationToken),
+      body: await authRegisteredEmail(user.name, verificationToken),
     });
   }
 );
@@ -104,7 +104,7 @@ const resendVerifyEmail = catchAsync(
     await emailHelper.sendEmail({
       email: user.email,
       subject: "Welcome to Foxflue",
-      body: await registeredEmailContent(user.name, verificationToken),
+      body: await authRegisteredEmail(user.name, verificationToken),
     });
   }
 );

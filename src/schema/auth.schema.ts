@@ -6,7 +6,7 @@ export const userDetailsSchema = object({
       .required("Name is required.")
       .trim()
       .min(4, "Title must be minimum 4 characters")
-      .max(80, "Title must be miximum 80 characters"),
+      .max(24, "Title must be miximum 24 characters"),
     email: string()
       .trim()
       .required("Email is required.")
