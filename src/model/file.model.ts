@@ -1,6 +1,7 @@
 import { Document, model, Schema } from "mongoose";
 
 export interface FileDocument extends Document {
+  _id: string;
   path: string;
   createdAt: string;
 }

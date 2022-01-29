@@ -1,8 +1,9 @@
 import mongoose from "mongoose";
 
 export interface BackupDocument extends mongoose.Document {
+  _id: string;
   path: string;
-  created: Date;
+  createdAt: Date;
 }
 
 const BackupSchema = new mongoose.Schema(

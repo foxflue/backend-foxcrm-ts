@@ -1,6 +1,7 @@
 import { Document, model, Schema } from "mongoose";
 
 export interface LeadDocument extends Document {
+  _id: string;
   name: string;
   email: string;
   message: string;

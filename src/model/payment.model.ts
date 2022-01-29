@@ -3,6 +3,7 @@ import { ProjectDocument } from "./project.model";
 import { UserDocument } from "./user.model";
 
 export interface PaymentDocument extends Document {
+  _id: string;
   project: ProjectDocument["_id"];
   customer: UserDocument["_id"];
   gateway: object;
