@@ -1,10 +1,13 @@
 import { Document, model, Schema } from "mongoose";
 import slugify from "../utils/slugify";
+import { OrganizationDocument } from "./organization.model";
 
 export interface PostDocument extends Document {
+  _id: string;
   type: string;
   title: string;
   slug: string;
+  organigation: OrganizationDocument["_id"];
   content: string;
   options: object;
   excerpt: string;
@@ -36,6 +39,11 @@ const PostSchema = new Schema(
       required: [true, "Slug is required"],
       trim: true,
       unique: true,
+    },
+    organization: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Organization",
     },
     content: {
       type: String,

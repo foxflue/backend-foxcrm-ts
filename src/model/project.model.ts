@@ -1,11 +1,14 @@
 import { Document, model, Schema } from "mongoose";
+import { OrganizationDocument } from "./organization.model";
 import { UserDocument } from "./user.model";
 
 export interface ProjectDocument extends Document {
+  _id: string;
   title: string;
   content: string;
   entities: string[];
   customer: UserDocument["_id"];
+  organization: OrganizationDocument["_id"];
   currency: string;
   price: number;
   due_amount: number;
@@ -38,6 +41,11 @@ const ProjectSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: [true, "Customer is required"],
+    },
+    organization: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Organization",
     },
     currency: {
       type: String,

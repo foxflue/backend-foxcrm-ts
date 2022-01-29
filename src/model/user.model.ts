@@ -2,6 +2,7 @@ import { Document, model, Schema } from "mongoose";
 import { encryptedPassword } from "../utils/passwordEncrypt.utils";
 
 export interface UserDocument extends Document {
+  _id: string;
   name: string;
   email: string;
   phone: string;
@@ -12,6 +13,7 @@ export interface UserDocument extends Document {
     base32: string | undefined;
   };
   company: string;
+  organization: string;
   address: AddressDocument;
   roles: string[];
   verification_token: string | undefined;
@@ -55,6 +57,11 @@ const UserSchema = new Schema(
     two_fa: {
       mode: Boolean,
       base32: String,
+    },
+    organization: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "Organization",
     },
     company: {
       type: String,
