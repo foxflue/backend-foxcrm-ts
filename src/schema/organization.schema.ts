@@ -13,6 +13,5 @@ export const organizationSchema = object({
       .email("Must be a valid email."),
     phone: string().required("Contact number is required.").trim(),
     type: string().required("Type is required.").trim(),
-    admin: string().required("Admin Id is required.").trim(),
   }),
 });

@@ -12,7 +12,10 @@ import emailHelper from "./../utils/emailHandler.utils";
 
 const store = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { organization, verificationToken } = await CreateOrg(req.body);
+    const { organization, verificationToken } = await CreateOrg(
+      res.locals.user._id,
+      req.body
+    );
 
     // Send Greetings Email
     await emailHelper.sendEmail({
