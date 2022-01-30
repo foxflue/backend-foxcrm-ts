@@ -59,7 +59,7 @@ export async function FetchPayment(id: string, res: Response) {
     }
 
     // Check if the payment is belong to the user
-    if (payment.customer._id !== res.locals.user._id) {
+    if (payment.customer !== res.locals.user._id) {
       throw new AppError("You are not authorized to view this payment", 401);
     }
 
@@ -112,12 +112,10 @@ export async function PaymentVerify({
   res: Response;
 }) {
   try {
-    const payment: PaymentDocument = await Payment.findById(id).populate(
-      "customer"
-    );
+    const payment = await Payment.findById(id).populate("customer");
 
     // Check if the payment is belong to the user
-    if (payment.customer._id !== res.locals.user._id) {
+    if (payment.customer !== res.locals.user._id) {
       throw new AppError("You are not authorized to view this payment", 401);
     }
     // Check if the payment is already done
