@@ -57,7 +57,7 @@ const index = catchAsync(
 
 const show = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const organization = await FetchOrg(req.params.id);
+    const organization = await FetchOrg(res.locals.user.organization);
 
     res.status(200).json({
       status: "success",
@@ -68,7 +68,7 @@ const show = catchAsync(
 
 const update = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await UpdateOrg(req.params.id, req.body);
+    await UpdateOrg(res.locals.user.organization, req.body);
 
     res.status(200).json({
       status: "success",

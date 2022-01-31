@@ -25,20 +25,20 @@ router.get(
 );
 
 router.get(
-  "/org-show/:id",
-  [authMiddleware.checkLogin, authMiddleware.checkAdmin],
+  "/org-show",
+  [authMiddleware.checkLogin],
   organizationController.show
 );
 
 router.patch(
-  "/org-update/:id",
+  "/org-update",
   [authMiddleware.checkLogin, authMiddleware.checkAdmin],
   organizationController.update
 );
 
 router.delete(
   "/org-destroy/:id",
-  [authMiddleware.checkLogin, authMiddleware.checkAdmin],
+  [authMiddleware.checkLogin, authMiddleware.checkSuperAdmin],
   organizationController.destroy
 );
 
