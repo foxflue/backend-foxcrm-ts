@@ -1,11 +1,16 @@
 import { DocumentDefinition, FilterQuery } from "mongoose";
+import { OrganizationDocument } from "../model/organization.model";
 import { Post, PostDocument } from "../model/post.model";
 import APIFeatures from "../utils/apiFeture.utils";
 import { AppError } from "../utils/AppError.utils";
 import hook from "../utils/hook";
 
-export async function CreatePost(input: DocumentDefinition<PostDocument>) {
+export async function CreatePost(
+  id: OrganizationDocument["_id"],
+  input: DocumentDefinition<PostDocument>
+) {
   try {
+    input.organigation = id;
     const post = await Post.create(input);
     await hook();
     return post;
@@ -41,11 +46,12 @@ export async function FetchPost(slug: FilterQuery<PostDocument>) {
   }
 }
 export async function UpdatePost(
+  id: OrganizationDocument["_id"],
   slug: FilterQuery<PostDocument>,
   input: DocumentDefinition<PostDocument>
 ) {
   try {
-    const post = await Post.findOneAndUpdate(slug, input);
+    const post = await Post.findOneAndUpdate({ slug, organigation: id }, input);
 
     if (!post) {
       throw new AppError("No post found with that slug", 404);
@@ -58,9 +64,12 @@ export async function UpdatePost(
   }
 }
 
-export async function DeletePost(slug: FilterQuery<PostDocument>) {
+export async function DeletePost(
+  id: OrganizationDocument["_id"],
+  slug: FilterQuery<PostDocument>
+) {
   try {
-    const post = await Post.findOneAndDelete({ slug });
+    const post = await Post.findOneAndDelete({ slug, organigation: id });
 
     if (!post) {
       throw new AppError("No post found with that slug", 404);
