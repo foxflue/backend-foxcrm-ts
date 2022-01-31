@@ -89,7 +89,7 @@ export async function UpdateOrg(
       throw new AppError("Not found", 404);
     }
 
-    return organization;
+    return;
   } catch (error) {
     throw error;
   }

@@ -3,6 +3,7 @@ import { orgRegisteredEmail } from "../emailContent/org.registered.emailContent"
 import catchAsync from "../utils/catchAsync.utils";
 import {
   CreateOrg,
+  DeleteOrg,
   EmailVerification,
   FetchAllOrg,
   FetchOrg,
@@ -67,18 +68,18 @@ const show = catchAsync(
 
 const update = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const organization = await UpdateOrg(req.params.id, req.body);
+    await UpdateOrg(req.params.id, req.body);
 
     res.status(200).json({
       status: "success",
-      data: organization,
+      message: "Updated!",
     });
   }
 );
 
 const destroy = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await FetchOrg(req.params.id);
+    await DeleteOrg(req.params.id);
 
     res.status(200).json({
       status: "success",
