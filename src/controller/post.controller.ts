@@ -1,15 +1,16 @@
 import { NextFunction, Request, Response } from "express";
-import { CreatePost, UpdatePost } from "../service/post.service";
 import {
-  DeleteProject,
-  FetchAllProject,
-  FetchProject,
-} from "../service/project.service";
+  CreatePost,
+  DeletePost,
+  FetchAllPost,
+  FetchPost,
+  UpdatePost,
+} from "../service/post.service";
 import catchAsync from "./../utils/catchAsync.utils";
 
 const index = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const posts = await FetchAllProject(req.query);
+    const posts = await FetchAllPost(req.query);
 
     res.status(200).json({
       status: "success",
@@ -32,7 +33,7 @@ const store = catchAsync(
 
 const show = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const post = await FetchProject(req.body.slug);
+    const post = await FetchPost(req.body.slug);
     res.status(200).json({
       status: "success",
       data: post,
@@ -52,7 +53,7 @@ const update = catchAsync(
 
 const destroy = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await DeleteProject(req.body.slug);
+    await DeletePost(req.body.slug);
 
     res.status(204).json({
       status: "success",
