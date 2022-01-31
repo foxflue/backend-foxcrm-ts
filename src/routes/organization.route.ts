@@ -20,7 +20,7 @@ router.post(
 
 router.get(
   "/org-index",
-  [authMiddleware.checkLogin, authMiddleware.checkAdmin],
+  [authMiddleware.checkLogin, authMiddleware.checkSuperAdmin],
   organizationController.index
 );
 

@@ -47,6 +47,20 @@ const checkLogin = catchAsync(
   }
 );
 
+const checkSuperAdmin = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = res.locals.user.roles;
+    if (!user.includes("superadmin")) {
+      return res.status(401).json({
+        status: "fail",
+        message: "Unauthorized Request",
+      });
+    }
+
+    next();
+  }
+);
+
 const checkAdmin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = res.locals.user.roles;
@@ -89,4 +103,10 @@ const checkEmployee = catchAsync(
   }
 );
 
-export default { checkLogin, checkAdmin, checkManager, checkEmployee };
+export default {
+  checkLogin,
+  checkSuperAdmin,
+  checkAdmin,
+  checkManager,
+  checkEmployee,
+};

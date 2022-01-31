@@ -87,7 +87,7 @@ const UserSchema = new Schema(
     },
     roles: {
       type: [String],
-      enum: ["user", "employee", "manager", "admin"],
+      enum: ["user", "employee", "manager", "admin", "superadmin"],
       default: ["user"],
     },
     verification_token: {
