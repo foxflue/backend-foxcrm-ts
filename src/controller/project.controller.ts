@@ -10,7 +10,10 @@ import catchAsync from "./../utils/catchAsync.utils";
 
 const index = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const projects = await FetchAllProject(req.query);
+    const projects = await FetchAllProject(
+      res.locals.user.organization,
+      req.query
+    );
 
     res.status(200).json({
       status: "success",
@@ -22,7 +25,7 @@ const index = catchAsync(
 
 const store = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const project = await CreateProject(req.body);
+    const project = await CreateProject(res.locals.user.organization, req.body);
     res.status(201).json({
       status: "success",
       data: project,
@@ -32,7 +35,10 @@ const store = catchAsync(
 
 const show = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const project = await FetchProject(req.params.id);
+    const project = await FetchProject(
+      res.locals.user.organization,
+      req.params.id
+    );
     res.status(200).json({
       status: "success",
       data: project,
@@ -42,7 +48,11 @@ const show = catchAsync(
 
 const update = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const project = await UpdateProject(req.params.id, req.body);
+    const project = await UpdateProject(
+      res.locals.user.organization,
+      req.params.id,
+      req.body
+    );
 
     res.status(200).json({
       status: "success",
@@ -53,7 +63,7 @@ const update = catchAsync(
 
 const destroy = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await DeleteProject(req.params.id);
+    await DeleteProject(res.locals.user.organization, req.params.id);
 
     res.status(204).json({
       status: "success",
