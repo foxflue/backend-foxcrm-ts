@@ -14,7 +14,7 @@ import emailHelper from "./../utils/emailHandler.utils";
 const store = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { organization, verificationToken } = await CreateOrg(
-      res.locals.user._id,
+      res.locals.user,
       req.body
     );
 
@@ -34,7 +34,7 @@ const store = catchAsync(
 
 const orgEmailVerify = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await EmailVerification(req.params.token);
+    await EmailVerification(res.locals.user.organization, req.params.token);
 
     res.status(200).json({
       status: "success",
