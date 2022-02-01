@@ -117,16 +117,16 @@ const forgotPassword = catchAsync(
       email: req.body.email,
     });
 
-    res.status(200).json({
-      status: "success",
-      message: "A verification email has been sent to the registered email",
-    });
-
     // Send Verification Email
     await emailHelper.sendEmail({
       email: user.email,
       subject: "Reset Password",
       body: await forgotPasswordEmailContent(user.name, verificationToken),
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "A verification email has been sent to the registered email",
     });
   }
 );
