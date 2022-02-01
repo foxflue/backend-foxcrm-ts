@@ -60,7 +60,6 @@ const UserSchema = new Schema(
     },
     organization: {
       type: Schema.Types.ObjectId,
-      required: true,
       ref: "Organization",
     },
     company: {
