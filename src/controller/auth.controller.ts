@@ -37,7 +37,7 @@ const login = catchAsync(
     // User response with token and user data
     res.status(200).json({
       status: "success",
-      token: token,
+      accessToken: token,
       data: user,
       secretToken: secretToken,
     });
@@ -49,17 +49,17 @@ const register = catchAsync(
     // User Create
     const { user, verificationToken } = await createUser(req.body);
 
-    // Response
-    res.status(201).json({
-      status: "success",
-      data: user,
-    });
-
     // Send Greetings Email
     await emailHelper.sendEmail({
       email: user.email,
       subject: "Welcome to Foxflue",
       body: await authRegisteredEmail(user.name, verificationToken),
+    });
+
+    // Response
+    res.status(201).json({
+      status: "success",
+      message: "Please verify your email.",
     });
   }
 );
