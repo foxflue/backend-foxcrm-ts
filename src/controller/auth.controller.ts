@@ -32,7 +32,10 @@ const login = catchAsync(
         body: await loginEmailContent(user.name, secretToken),
       });
 
-      return res.status(200).json("Check your email.");
+      return res.status(200).json({
+        id: user._id,
+        message: "Check your email.",
+      });
     }
     // User response with token and user data
     res.status(200).json({
@@ -94,17 +97,17 @@ const resendVerifyEmail = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { user, verificationToken } = await ResendEmailForVerify(req.body);
 
-    // Response
-    res.status(201).json({
-      status: "success",
-      data: user,
-    });
-
     // Send Greetings Email
     await emailHelper.sendEmail({
       email: user.email,
       subject: "Welcome to Foxflue",
       body: await authRegisteredEmail(user.name, verificationToken),
+    });
+
+    // Response
+    res.status(201).json({
+      status: "success",
+      message: "Check you email.",
     });
   }
 );
@@ -179,12 +182,12 @@ const set2FAMode = catchAsync(async (req, res, next) => {
 });
 
 const verify2FASecret = catchAsync(async (req, res, next) => {
-  const { user, token } = await VerifySecret(req.params.id, req.body.otp);
+  const { user, token } = await VerifySecret(req.params.id, req.params.otp);
 
   // send responce
   res.status(200).json({
     status: "success",
-    token: token,
+    accessToken: token,
     user: user,
   });
 });
