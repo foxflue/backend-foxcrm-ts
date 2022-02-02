@@ -25,7 +25,7 @@ const index = catchAsync(
 
 const store = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const project = await CreateProject(res.locals.user.organization, req.body);
+    const project = await CreateProject(res.locals.user, req.body);
     res.status(201).json({
       status: "success",
       data: project,

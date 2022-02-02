@@ -1,16 +1,18 @@
 import { DocumentDefinition } from "mongoose";
 import { OrganizationDocument } from "../model/organization.model";
 import { Project, ProjectDocument } from "../model/project.model";
+import { UserDocument } from "../model/user.model";
 import APIFeatures from "../utils/apiFeture.utils";
 import { AppError } from "../utils/AppError.utils";
 
 export async function CreateProject(
-  id: OrganizationDocument["_id"],
+  user: UserDocument,
   input: DocumentDefinition<ProjectDocument>
 ) {
   try {
     input.due_amount = input.price;
-    input.organization = id;
+    input.customer = user._id;
+    input.organization = user.organization;
     return await Project.create(input);
   } catch (error) {
     throw error;
