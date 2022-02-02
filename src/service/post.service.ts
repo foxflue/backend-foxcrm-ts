@@ -4,13 +4,16 @@ import { Post, PostDocument } from "../model/post.model";
 import APIFeatures from "../utils/apiFeture.utils";
 import { AppError } from "../utils/AppError.utils";
 import hook from "../utils/hook";
+import { slugify } from "../utils/slugify";
 
 export async function CreatePost(
   id: OrganizationDocument["_id"],
   input: DocumentDefinition<PostDocument>
 ) {
   try {
-    input.organigation = id;
+    input.organization = id;
+    input.slug = await slugify(input.title);
+
     const post = await Post.create(input);
     await hook();
     return post;

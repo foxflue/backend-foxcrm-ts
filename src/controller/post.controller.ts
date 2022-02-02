@@ -22,7 +22,7 @@ const index = catchAsync(
 
 const store = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const post = await CreatePost(res.locals.user.organigation, req.body);
+    const post = await CreatePost(res.locals.user.organization, req.body);
 
     res.status(201).json({
       status: "success",
@@ -44,7 +44,7 @@ const show = catchAsync(
 const update = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const post = await UpdatePost(
-      res.locals.user.organigation,
+      res.locals.user.organization,
       req.body.slug,
       req.body
     );
@@ -57,7 +57,7 @@ const update = catchAsync(
 
 const destroy = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await DeletePost(res.locals.user.organigation, req.body.slug);
+    await DeletePost(res.locals.user.organization, req.body.slug);
 
     res.status(204).json({
       status: "success",

@@ -1,5 +1,4 @@
 import { Document, model, Schema } from "mongoose";
-import slugify from "../utils/slugify";
 import { OrganizationDocument } from "./organization.model";
 
 export interface PostDocument extends Document {
@@ -7,7 +6,7 @@ export interface PostDocument extends Document {
   type: string;
   title: string;
   slug: string;
-  organigation: OrganizationDocument["_id"];
+  organization: OrganizationDocument["_id"];
   content: string;
   options: object;
   excerpt: string;
@@ -82,12 +81,5 @@ const PostSchema = new Schema(
 );
 
 PostSchema.index({ slug: 1 });
-
-PostSchema.pre("save", async function (next) {
-  let post = this as PostDocument;
-
-  post.slug = await slugify(post.title);
-  next();
-});
 
 export const Post = model<PostDocument>("Post", PostSchema);
