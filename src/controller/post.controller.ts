@@ -33,7 +33,7 @@ const store = catchAsync(
 
 const show = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const post = await FetchPost(req.body.slug);
+    const post = await FetchPost(req.params.slug);
     res.status(200).json({
       status: "success",
       data: post,
@@ -45,19 +45,19 @@ const update = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const post = await UpdatePost(
       res.locals.user.organization,
-      req.body.slug,
+      req.params.slug,
       req.body
     );
     res.status(200).json({
       status: "success",
-      data: post,
+      message: "Updated.",
     });
   }
 );
 
 const destroy = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await DeletePost(res.locals.user.organization, req.body.slug);
+    await DeletePost(res.locals.user.organization, req.params.slug);
 
     res.status(204).json({
       status: "success",

@@ -1,4 +1,4 @@
-import { DocumentDefinition, FilterQuery } from "mongoose";
+import { DocumentDefinition } from "mongoose";
 import { OrganizationDocument } from "../model/organization.model";
 import { Post, PostDocument } from "../model/post.model";
 import APIFeatures from "../utils/apiFeture.utils";
@@ -36,7 +36,7 @@ export async function FetchAllPost(query: object) {
   }
 }
 
-export async function FetchPost(slug: FilterQuery<PostDocument>) {
+export async function FetchPost(slug: PostDocument["slug"]) {
   try {
     const post = await Post.findOne({ slug });
 
@@ -50,10 +50,13 @@ export async function FetchPost(slug: FilterQuery<PostDocument>) {
 }
 export async function UpdatePost(
   id: OrganizationDocument["_id"],
-  slug: FilterQuery<PostDocument>,
+  slug: PostDocument["slug"],
   input: DocumentDefinition<PostDocument>
 ) {
   try {
+    if (input.title) {
+      input.slug = await slugify(input.title);
+    }
     const post = await Post.findOneAndUpdate({ slug, organigation: id }, input);
 
     if (!post) {
@@ -61,7 +64,7 @@ export async function UpdatePost(
     }
     await hook();
 
-    return post;
+    return;
   } catch (error) {
     throw error;
   }
@@ -69,7 +72,7 @@ export async function UpdatePost(
 
 export async function DeletePost(
   id: OrganizationDocument["_id"],
-  slug: FilterQuery<PostDocument>
+  slug: PostDocument["slug"]
 ) {
   try {
     const post = await Post.findOneAndDelete({ slug, organigation: id });
