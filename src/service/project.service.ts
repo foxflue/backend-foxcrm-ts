@@ -20,12 +20,12 @@ export async function CreateProject(
 }
 
 export async function FetchAllProject(
-  id: OrganizationDocument["_id"],
+  organization: OrganizationDocument["_id"],
   query: object
 ) {
   try {
     const features = new APIFeatures(
-      Project.find({ organization: id }).populate("customer"),
+      Project.find({ organization }).populate("customer"),
       query
     )
       .filter()
@@ -40,13 +40,13 @@ export async function FetchAllProject(
 }
 
 export async function FetchProject(
-  org_id: OrganizationDocument["_id"],
+  organization: OrganizationDocument["_id"],
   id: string
 ) {
   try {
     const project = await Project.findOne({
       _id: id,
-      organization: org_id,
+      organization,
     }).populate("customer payments");
 
     if (!project) {
@@ -59,13 +59,13 @@ export async function FetchProject(
 }
 
 export async function UpdateProject(
-  org_id: OrganizationDocument["_id"],
+  organization: OrganizationDocument["_id"],
   id: string,
   input: DocumentDefinition<ProjectDocument>
 ) {
   try {
     const project = await Project.findOneAndUpdate(
-      { _id: id, organization: org_id },
+      { _id: id, organization },
       input,
       {
         new: true,
@@ -84,13 +84,13 @@ export async function UpdateProject(
 }
 
 export async function DeleteProject(
-  org_id: OrganizationDocument["_id"],
+  organization: OrganizationDocument["_id"],
   id: string
 ) {
   try {
     const project = await Project.findOneAndDelete({
       _id: id,
-      organization: org_id,
+      organization,
     });
 
     if (!project) {

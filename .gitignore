@@ -3,3 +3,7 @@ node_modules
 
 # Dotenv File
 .env
+
+cache.js
+
+userAddress.schema.ts
