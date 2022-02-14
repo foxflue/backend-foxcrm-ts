@@ -20,7 +20,7 @@ router.post(
   authController.set2FAMode
 );
 router.post("/auth/two-fa-verify/:id/:otp", authController.verify2FASecret);
-router.get("/auth/user", authMiddleware.checkLogin, authController.me);
+router.get("/auth/user", [authMiddleware.checkLogin], authController.me);
 router.post("/auth/verify-email/:token", authController.verifyEmail);
 router.post("/auth/resend-verify-email", authController.resendVerifyEmail);
 router.post(

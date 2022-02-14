@@ -45,7 +45,11 @@ export async function LoginUser({
       "+password"
     )) as UserDocument;
 
-    if (!user || !(await comparePassword(password, user.password))) {
+    if (
+      !user ||
+      !user.password ||
+      !(await comparePassword(password, user.password))
+    ) {
       throw new AppError("Invalid credentials!", 401);
     }
 
