@@ -8,8 +8,6 @@ export interface OrganizationDocument extends Document {
   about: string;
   image: string;
   admin: string;
-  verification_token: string | undefined;
-  verification_expiring_at: number | undefined;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -42,8 +40,6 @@ const organizationSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: true,
     },
-    verification_token: String,
-    verification_expiring_at: Date,
   },
   {
     timestamps: true,
