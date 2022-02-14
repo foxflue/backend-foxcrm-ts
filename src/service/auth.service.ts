@@ -59,7 +59,6 @@ export async function LoginUser({
       const secretToken = speakeasy.totp({
         secret: user.two_fa.base32,
         encoding: "base32",
-        time: 120,
       });
 
       return {
@@ -336,7 +335,7 @@ export async function VerifySecret(id: string, otp: string) {
       secret: user.two_fa.base32,
       encoding: "base32",
       token: otp,
-      time: 120,
+      window: 6,
     });
 
     if (!isValid) {

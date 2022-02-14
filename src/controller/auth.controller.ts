@@ -173,7 +173,7 @@ const socialLogin = catchAsync(async (req, res, next) => {
 
 const set2FAMode = catchAsync(async (req, res, next) => {
   await SetTwoFA({
-    id: res.locals.user._id,
+    id: res.locals.user.id,
     mode: req.body.mode,
   });
   res

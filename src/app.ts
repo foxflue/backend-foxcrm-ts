@@ -14,7 +14,6 @@ import paymentRoute from "./routes/payment.route";
 import postRoute from "./routes/post.route";
 import projectRoute from "./routes/project.route";
 import userRoute from "./routes/user.route";
-import "./utils/cache.utils";
 
 dotenv.config();
 
