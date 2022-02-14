@@ -1,44 +1,21 @@
 import { NextFunction, Request, Response } from "express";
-import { orgRegisteredEmail } from "../emailContent/org.registered.emailContent";
 import catchAsync from "../utils/catchAsync.utils";
 import {
   CreateOrg,
   DeleteOrg,
-  EmailVerification,
   FetchAllOrg,
   FetchOrg,
   UpdateOrg,
 } from "./../service/organization.service";
-import emailHelper from "./../utils/emailHandler.utils";
 
 const store = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { organization, verificationToken } = await CreateOrg(
-      res.locals.user,
-      req.body
-    );
-
-    // Send Greetings Email
-    await emailHelper.sendEmail({
-      email: organization.email,
-      subject: "Welcome to Foxflue",
-      body: await orgRegisteredEmail(organization.title, verificationToken),
-    });
+    console.log(res.locals.user);
+    const organization = await CreateOrg(res.locals.user, req.body);
 
     res.status(200).json({
       status: "success",
-      message: "Please verify your email.",
-    });
-  }
-);
-
-const orgEmailVerify = catchAsync(
-  async (req: Request, res: Response, next: NextFunction) => {
-    await EmailVerification(res.locals.user.organization, req.params.token);
-
-    res.status(200).json({
-      status: "success",
-      message: "Email verified.",
+      data: organization,
     });
   }
 );
@@ -94,5 +71,4 @@ export default {
   show,
   update,
   destroy,
-  orgEmailVerify,
 };

@@ -6,16 +6,14 @@ import {
 import { UserDocument } from "../model/user.model";
 import APIFeatures from "../utils/apiFeture.utils";
 import { AppError } from "../utils/AppError.utils";
-import { encryptedRandomString, hashString } from "./../utils/hashString.utils";
 
 export async function CreateOrg(
   user: UserDocument,
   input: DocumentDefinition<OrganizationDocument>
 ) {
   try {
-    const verificationToken = await hashString();
-    input.verification_token = await encryptedRandomString(verificationToken);
-    input.verification_expiring_at = Date.now() + 10 * 60 * 60 * 1000;
+    input.email = user.email;
+    input.phone = user.phone;
     input.admin = user._id;
 
     const organization = await Organization.create(input);
@@ -23,33 +21,7 @@ export async function CreateOrg(
     user.organization = organization._id;
     await user.save();
 
-    return { organization, verificationToken };
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function EmailVerification(id: string, token: string) {
-  try {
-    const organization = await Organization.findOne({
-      _id: id,
-      verification_token: await encryptedRandomString(token),
-      verification_expiring_at: { $gt: Date.now() },
-    });
-
-    if (!organization) {
-      throw new AppError(
-        "Your verification token is either expired or invalid or you are already verified or your are unathorized.",
-        400
-      );
-    }
-
-    organization.verification_token = undefined;
-    organization.verification_expiring_at = undefined;
-
-    await organization.save();
-
-    return;
+    return organization;
   } catch (error) {
     throw error;
   }
