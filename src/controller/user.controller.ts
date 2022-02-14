@@ -43,7 +43,7 @@ const show = catchAsync(
 
 const destroy = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    await RemoveOne(req.params.id);
+    await RemoveOne(res.locals.user.organization, req.params.id);
 
     res.status(204).json({
       status: "success",

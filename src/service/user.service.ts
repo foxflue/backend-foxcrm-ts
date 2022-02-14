@@ -1,4 +1,5 @@
 import { Project } from "../model/project.model";
+import { AppError } from "../utils/AppError.utils";
 import { User } from "./../model/user.model";
 import APIFeature from "./../utils/apiFeture.utils";
 
@@ -23,7 +24,7 @@ export async function FetchOne(organization: string, _id: string) {
       select: "-content",
     });
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found", 404);
     }
 
     return user;
@@ -32,17 +33,17 @@ export async function FetchOne(organization: string, _id: string) {
   }
 }
 
-export async function RemoveOne(query: string) {
+export async function RemoveOne(organization: string, _id: string) {
   try {
-    const user = await User.findByIdAndDelete(query).populate({
+    const user = await User.findOneAndDelete({ _id, organization }).populate({
       path: "projects",
       select: "-content",
     });
     if (!user) {
-      throw new Error("User not found");
+      throw new AppError("User not found", 404);
     }
     // Delete User Projects
-    await Project.deleteMany({ customer: query });
+    await Project.deleteMany({ customer: _id });
 
     return;
   } catch (error) {
