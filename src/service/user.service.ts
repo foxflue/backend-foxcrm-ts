@@ -2,9 +2,9 @@ import { Project } from "../model/project.model";
 import { User } from "./../model/user.model";
 import APIFeature from "./../utils/apiFeture.utils";
 
-export async function FetchAll(query: object) {
+export async function FetchAll(organization: string, query: object) {
   try {
-    const apiFeature = new APIFeature(User.find(), query)
+    const apiFeature = new APIFeature(User.find({ organization }), query)
       .filter()
       .search()
       .limitFields()
@@ -16,9 +16,9 @@ export async function FetchAll(query: object) {
   }
 }
 
-export async function FetchOne(query: string) {
+export async function FetchOne(organization: string, _id: string) {
   try {
-    const user = await User.findById(query).populate({
+    const user = await User.findOne({ _id, organization }).populate({
       path: "projects",
       select: "-content",
     });

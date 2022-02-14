@@ -11,7 +11,7 @@ import catchAsync from "./../utils/catchAsync.utils";
 
 const index = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const users = await FetchAll(req.query);
+    const users = await FetchAll(res.locals.user.organization, req.query);
     res.status(200).json({
       status: "success",
       results: users.length,
@@ -22,6 +22,7 @@ const index = catchAsync(
 
 const store = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
+    req.body.organization = res.locals.user.organization;
     await createUser(req.body);
     res.status(201).json({
       status: "success",
@@ -32,7 +33,7 @@ const store = catchAsync(
 
 const show = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    const user = await FetchOne(req.params.id);
+    const user = await FetchOne(res.locals.user.organization, req.params.id);
     res.status(200).json({
       status: "success",
       data: omit(user.toJSON(), "password"),
