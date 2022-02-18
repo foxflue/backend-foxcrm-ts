@@ -1,10 +1,10 @@
 import * as dotenv from "dotenv";
 import express from "express";
-import mongoose from "mongoose";
 import cron from "node-cron";
 import { DeleteFakeAccount } from "./../src/service/auth.service";
 import four04Route from "./common/404.error";
 import { globalErrorHandler } from "./common/error.controller";
+import { connectDB } from "./db/connect.db";
 import authRoute from "./routes/auth.route";
 import dashboardRoute from "./routes/dashboard.route";
 import fileRoute from "./routes/file.route";
@@ -17,22 +17,13 @@ import userRoute from "./routes/user.route";
 
 dotenv.config();
 
-const app = express();
+export const app = express();
 
 const PORT = Object(process.env).PORT as number;
 const HOST = Object(process.env).HOST as string;
-const MONGO_URI = Object(process.env).MONGODB_URL as string;
 
 // Connect MongoDB
-try {
-  (async () => {
-    await mongoose.connect(MONGO_URI);
-    console.log("MongoDB connected");
-  })();
-} catch (e) {
-  console.log(e);
-  process.exit(1);
-}
+connectDB();
 
 app.use(express.json());
 
