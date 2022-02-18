@@ -73,7 +73,10 @@ export async function LoginUser({
     }
 
     // Create token
-    const token = await jwtHelper.signToken(user.id, rememberme || false);
+    const token = await jwtHelper.signToken({
+      id: user.id,
+      rememberme: rememberme || false,
+    });
 
     return {
       user: omit(
@@ -299,7 +302,7 @@ export async function OAuthLogin({
     }
 
     // Generate JWT Token
-    const token = await jwtHelper.signToken(user._id, true);
+    const token = await jwtHelper.signToken({ id: user.id, rememberme: true });
 
     return token;
   } catch (error) {
@@ -346,7 +349,7 @@ export async function VerifySecret(id: string, otp: string) {
       throw new AppError("Invalid Input.", 406);
     }
 
-    const token = jwtHelper.signToken(user._id, false);
+    const token = jwtHelper.signToken({ id: user.id, rememberme: false });
 
     return {
       user: omit(

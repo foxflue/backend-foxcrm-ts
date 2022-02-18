@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 
 type extractTokenTypeDetails = (req: Request) => string | false;
 type verifyTokenTypeDetails = (token: string) => object | string;
-type SignTokenTypeDetails = (id: string, rememberme: boolean) => string;
+type SignTokenTypeDetails = (args: object) => string;
 
 const extractToken: extractTokenTypeDetails = (req) => {
   let token = req.header("authorization") as string;
@@ -19,9 +19,9 @@ const extractToken: extractTokenTypeDetails = (req) => {
 const verifyToken: verifyTokenTypeDetails = (token) =>
   jwt.verify(token, Object(process.env).JWT_SECRET_KEY);
 
-const signToken: SignTokenTypeDetails = (id, rememberme) => {
-  return jwt.sign({ id }, Object(process.env).JWT_SECRET_KEY, {
-    expiresIn: rememberme ? "7d" : "1d",
+const signToken: SignTokenTypeDetails = (args) => {
+  return jwt.sign({ id: Object(args).id }, Object(process.env).JWT_SECRET_KEY, {
+    expiresIn: Object(args).rememberme ? "7d" : "1d",
   });
 };
 
