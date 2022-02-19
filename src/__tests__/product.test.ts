@@ -10,10 +10,83 @@ const userPayload = {
   rememberme: true,
 };
 
+const projectPayload = {
+  title: "Tradelia",
+  content: "Gorcery sell on online",
+  entities: ["selling", "Delivery", "Payment"],
+  price: 90.9,
+};
+
 describe("Product", () => {
   beforeAll(async () => {
     connectDB();
   });
+
+  describe("Post Product route", () => {
+    describe("Unauthorized user", () => {
+      test("Should return 401", async () => {
+        const { statusCode } = await supertest(app)
+          .post(`/api/v2/project`)
+          .send(projectPayload);
+
+        expect(statusCode).toBe(401);
+      });
+    });
+
+    describe("Authorized User", () => {
+      test("Should return 201", async () => {
+        const jwtToken = await jwtHelper.signToken(userPayload);
+
+        const { statusCode, body } = await supertest(app)
+          .post("/api/v2/project")
+          .set("Authorization", `Bearer ${jwtToken}`)
+          .send(projectPayload);
+
+        expect(statusCode).toBe(201);
+        expect(body).toBe({
+          data: {
+            __v: 0,
+            _id: expect.any(String),
+            content: "Gorcery sell on online",
+            created_at: expect.any(String),
+            currency: "USD",
+            customer: "620a6dae34f64e64a72cfe75",
+            due_amount: 90.9,
+            entities: ["selling", "Delivery", "Payment"],
+            id: expect.any(String),
+            organization: "620a814d351648903b614f68",
+            price: 90.9,
+            status: "processing",
+            title: "Tradelia",
+            updated_at: expect.any(String),
+          },
+          status: "success",
+        });
+      });
+    });
+  });
+
+  // describe.only("Get Products route ", () => {
+  //   describe("UnAuthorized User", () => {
+  //     test("Should return 401", async () => {
+  //       const { statusCode } = await supertest(app).get(`/api/v2/project`);
+
+  //       expect(statusCode).toBe(401);
+  //     });
+  //   });
+
+  //   describe("Authorized User", () => {
+  //     test("Should return 200", async () => {
+  //       const jwtToken = await jwtHelper.signToken(userPayload);
+
+  //       const { statusCode } = await supertest(app)
+  //         .get(`/api/v2/project`)
+  //         .set("Authorization", `Bearer ${jwtToken}`);
+
+  //       expect(statusCode).toBe(200);
+  //     });
+  //   });
+  // });
 
   describe("Get Product route", () => {
     describe("Given the product doesn't exist", () => {
