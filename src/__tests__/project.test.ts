@@ -1,9 +1,9 @@
 // import { MongoMemoryServer } from "mongodb-memory-server";
 import supertest from "supertest";
-import { app } from "./../app";
-import { connectDB } from "./../db/connect.db";
-import { disconnectDB } from "./../db/disconnect.db";
-import jwtHelper from "./../utils/jwtHelper.utils";
+import { app } from "../app";
+import { connectDB } from "../db/connect.db";
+import { disconnectDB } from "../db/disconnect.db";
+import jwtHelper from "../utils/jwtHelper.utils";
 
 const userPayload = {
   id: "620a6dae34f64e64a72cfe75",
@@ -17,12 +17,12 @@ const projectPayload = {
   price: 90.9,
 };
 
-describe("Product", () => {
+describe("Project", () => {
   beforeAll(async () => {
     connectDB();
   });
 
-  describe("Post Product route", () => {
+  describe("Post Project route", () => {
     describe("Unauthorized user", () => {
       test("Should return 401", async () => {
         const { statusCode } = await supertest(app)
@@ -66,30 +66,30 @@ describe("Product", () => {
     });
   });
 
-  // describe.only("Get Products route ", () => {
-  //   describe("UnAuthorized User", () => {
-  //     test("Should return 401", async () => {
-  //       const { statusCode } = await supertest(app).get(`/api/v2/project`);
+  describe("Get Project route ", () => {
+    describe("UnAuthorized User", () => {
+      test("Should return 401", async () => {
+        const { statusCode } = await supertest(app).get(`/api/v2/project`);
 
-  //       expect(statusCode).toBe(401);
-  //     });
-  //   });
+        expect(statusCode).toBe(401);
+      });
+    });
 
-  //   describe("Authorized User", () => {
-  //     test("Should return 200", async () => {
-  //       const jwtToken = await jwtHelper.signToken(userPayload);
+    describe("Authorized User", () => {
+      test("Should return 200", async () => {
+        const jwtToken = await jwtHelper.signToken(userPayload);
 
-  //       const { statusCode } = await supertest(app)
-  //         .get(`/api/v2/project`)
-  //         .set("Authorization", `Bearer ${jwtToken}`);
+        const { statusCode } = await supertest(app)
+          .get(`/api/v2/project`)
+          .set("Authorization", `Bearer ${jwtToken}`);
 
-  //       expect(statusCode).toBe(200);
-  //     });
-  //   });
-  // });
+        expect(statusCode).toBe(200);
+      });
+    });
+  });
 
-  describe("Get Product route", () => {
-    describe("Given the product doesn't exist", () => {
+  describe("Get Project route", () => {
+    describe("Given the Project doesn't exist", () => {
       test("Should return a 401 ", async () => {
         const projectId = "project_20746";
 
