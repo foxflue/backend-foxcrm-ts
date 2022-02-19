@@ -17,11 +17,16 @@ const projectPayload = {
   price: 90.9,
 };
 
+const updatePayload = {
+  title: "Hifixer",
+};
+
 describe("Project", () => {
   beforeAll(async () => {
     connectDB();
   });
 
+  // 1) POST PROJECT API TEST
   describe("Post Project route", () => {
     describe("Unauthorized user", () => {
       test("Should return 401", async () => {
@@ -43,29 +48,11 @@ describe("Project", () => {
           .send(projectPayload);
 
         expect(statusCode).toBe(201);
-        expect(body).toBe({
-          data: {
-            __v: 0,
-            _id: expect.any(String),
-            content: "Gorcery sell on online",
-            created_at: expect.any(String),
-            currency: "USD",
-            customer: "620a6dae34f64e64a72cfe75",
-            due_amount: 90.9,
-            entities: ["selling", "Delivery", "Payment"],
-            id: expect.any(String),
-            organization: "620a814d351648903b614f68",
-            price: 90.9,
-            status: "processing",
-            title: "Tradelia",
-            updated_at: expect.any(String),
-          },
-          status: "success",
-        });
       });
     });
   });
 
+  // 2) GET PROJECTS  API TEST
   describe("Get Project route ", () => {
     describe("UnAuthorized User", () => {
       test("Should return 401", async () => {
@@ -88,6 +75,7 @@ describe("Project", () => {
     });
   });
 
+  // 3) GET PROJECT  API TEST
   describe("Get Project route", () => {
     describe("Given the Project doesn't exist", () => {
       test("Should return a 401 ", async () => {
@@ -97,14 +85,15 @@ describe("Project", () => {
       });
 
       test("Should return a 404", async () => {
-        const projectId = "project_20746";
+        const projectId = "61e8f90c05903f3bf820e5ca";
         const jwtToken = await jwtHelper.signToken(userPayload);
 
-        await supertest(app)
+        const { statusCode } = await supertest(app)
           .get(`/api/v2/project/${projectId}`)
-          .set("Authorization", `Bearer ${jwtToken}`)
-          .expect(404);
-      }, 10000);
+          .set("Authorization", `Bearer ${jwtToken}`);
+
+        expect(statusCode).toBe(404);
+      });
 
       test("Should return a 200", async () => {
         const projectId = "61e8f90c05903f3bf820e5af";
@@ -116,7 +105,85 @@ describe("Project", () => {
 
         console.log(statusCode);
         console.log(body);
-      }, 10000);
+      });
+    });
+  });
+
+  // 4) UPDATE PROJECT API TEST
+  describe("Update Project route", () => {
+    describe("Unauthorized user", () => {
+      test("Should return 401", async () => {
+        const projectId = "61e8f90c05903f3bf820e5af";
+        const { statusCode } = await supertest(app)
+          .patch(`/api/v2/project/${projectId}`)
+          .send(updatePayload);
+
+        expect(statusCode).toBe(401);
+      });
+    });
+
+    describe("Authorized User", () => {
+      test("Should return 404", async () => {
+        const projectId = "61e8f90c05903f3bf820e5ay";
+        const jwtToken = await jwtHelper.signToken(userPayload);
+
+        const { statusCode } = await supertest(app)
+          .patch(`/api/v2/project/${projectId}`)
+          .set("Authorization", `Bearer ${jwtToken}`)
+          .send(updatePayload);
+
+        expect(statusCode).toBe(404);
+      });
+
+      test("Should return 200", async () => {
+        const projectId = "61e8f90c05903f3bf820e5af";
+        const jwtToken = await jwtHelper.signToken(userPayload);
+
+        const { statusCode } = await supertest(app)
+          .patch(`/api/v2/project/${projectId}`)
+          .set("Authorization", `Bearer ${jwtToken}`)
+          .send(updatePayload);
+
+        expect(statusCode).toBe(200);
+      });
+    });
+  });
+
+  //  5) DELETE PROJECT API TEST
+  describe.only("Delete Project route", () => {
+    describe("Unauthorized user", () => {
+      test("Should return 401", async () => {
+        const projectId = "61e8f90c05903f3bf820e5af";
+        const { statusCode } = await supertest(app).delete(
+          `/api/v2/project/${projectId}`
+        );
+
+        expect(statusCode).toBe(401);
+      });
+    });
+
+    describe("Authorized User", () => {
+      test("Should return 404", async () => {
+        const projectId = "61e8f90c05903f3bf820e5ay";
+        const jwtToken = await jwtHelper.signToken(userPayload);
+
+        const { statusCode } = await supertest(app)
+          .delete(`/api/v2/project/${projectId}`)
+          .set("Authorization", `Bearer ${jwtToken}`);
+
+        expect(statusCode).toBe(404);
+      });
+
+      test("Should return 200", async () => {
+        const projectId = "61e8f90c05903f3bf820e5af";
+        const jwtToken = await jwtHelper.signToken(userPayload);
+
+        const { statusCode } = await supertest(app)
+          .delete(`/api/v2/project/${projectId}`)
+          .set("Authorization", `Bearer ${jwtToken}`);
+
+        expect(statusCode).toBe(200);
+      });
     });
   });
 
