@@ -4,8 +4,8 @@
   "description": "Foxflue First Project\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b[C\u001b \u0006First product of foxflue",
   "main": "app.js",
   "scripts": {
-    "test": "jest",
-    "dev": "nodemon --config nodemon.json src/app.ts"
+    "test": "jest --runInBand --detectOpenHandles",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
   },
   "repository": {
     "type": "git",
