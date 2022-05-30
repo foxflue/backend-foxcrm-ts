@@ -7,9 +7,9 @@ import mongoose from "mongoose";
 // Connect MongoDB
 export const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb://localhost:27017/foxcrm-new");
+    await mongoose.connect(process.env.MONGODB_URL as string);
     console.log("MongoDB connected");
-  } catch (e) {
+  } catch (e : any) {
     console.log(e);
     process.exit(1);
   }

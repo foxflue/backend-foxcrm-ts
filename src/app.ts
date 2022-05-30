@@ -1,7 +1,6 @@
-import * as dotenv from "dotenv";
 import express from "express";
-import cron from "node-cron";
-import { DeleteFakeAccount } from "./../src/service/auth.service";
+// import cron from "node-cron";
+// import { DeleteFakeAccount } from "./../src/service/auth.service";
 import four04Route from "./common/404.error";
 import { globalErrorHandler } from "./common/error.controller";
 import { connectDB } from "./db/connect.db";
@@ -15,21 +14,16 @@ import postRoute from "./routes/post.route";
 import projectRoute from "./routes/project.route";
 import userRoute from "./routes/user.route";
 
-dotenv.config();
-
-export const app = express();
-
-const PORT = Object(process.env).PORT as number;
-const HOST = Object(process.env).HOST as string;
+const app = express();
 
 // Connect MongoDB
 connectDB();
 
 app.use(express.json());
 
-cron.schedule("01 0 0 * * *", () => {
-  DeleteFakeAccount();
-});
+// cron.schedule("01 0 0 * * *", () => {
+//   DeleteFakeAccount();
+// });
 
 app.use("/api/v2", authRoute);
 app.use("/api/v2", userRoute);
@@ -44,6 +38,4 @@ app.use("/api/v2", orgRoute);
 app.use(globalErrorHandler);
 app.use(four04Route);
 
-app.listen(PORT, HOST, () => {
-  console.log(`Server running on http://${HOST}:${PORT}`);
-});
+export default app;
